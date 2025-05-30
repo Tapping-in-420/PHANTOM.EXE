@@ -173,7 +173,6 @@ end
 
 -- ==================================================================================
 -- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
--- ==================================================================================
 -- Updated GUI with Centered Header (Replace the GUI section in your key-system.lua)
 -- ==================================================================================
 -- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
@@ -253,27 +252,26 @@ local function createKeySystemGUI()
     headerFrame.Size = UDim2.new(1, 0, 0, 80)
     headerFrame.BackgroundTransparency = 1
     
-    -- Ghost Logo (centered at top)
+    -- Ghost Logo (centered at top, black background)
     local logoFrame = Instance.new("Frame")
     logoFrame.Name = "Logo"
     logoFrame.Parent = headerFrame
     logoFrame.AnchorPoint = Vector2.new(0.5, 0)
     logoFrame.Position = UDim2.new(0.5, 0, 0, 10)
     logoFrame.Size = UDim2.new(0, 45, 0, 45)
-    logoFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    logoFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     logoFrame.BorderSizePixel = 0
     
     local logoCorner = Instance.new("UICorner")
     logoCorner.CornerRadius = UDim.new(0, 12)
     logoCorner.Parent = logoFrame
     
-    local logoGradient = Instance.new("UIGradient")
-    logoGradient.Parent = logoFrame
-    logoGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(186, 85, 211)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(138, 43, 226))
-    }
-    logoGradient.Rotation = 45
+    -- Optional: Add subtle border to black background
+    local logoStroke = Instance.new("UIStroke")
+    logoStroke.Color = Color3.fromRGB(138, 43, 226)
+    logoStroke.Thickness = 1
+    logoStroke.Transparency = 0.5
+    logoStroke.Parent = logoFrame
     
     -- Ghost emoji as placeholder (you can replace this)
     local logoText = Instance.new("TextLabel")
@@ -542,7 +540,15 @@ local function createKeySystemGUI()
     addHoverEffect(validateButton, Color3.fromRGB(186, 85, 211), Color3.fromRGB(138, 43, 226))
     addHoverEffect(getKeyButton, Color3.fromRGB(60, 60, 75), Color3.fromRGB(40, 40, 55))
     addHoverEffect(discordButton, Color3.fromRGB(108, 121, 255), Color3.fromRGB(88, 101, 242))
-    addHoverEffect(closeButton, Color3.fromRGB(255, 59, 59), Color3.fromRGB(40, 40, 50))
+    
+    -- Special hover effect for close button (no background color change)
+    closeButton.MouseEnter:Connect(function()
+        TweenService:Create(closeButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 100, 100)}):Play()
+    end)
+    
+    closeButton.MouseLeave:Connect(function()
+        TweenService:Create(closeButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+    end)
     
     -- Focus effect for input
     keyInput.Focused:Connect(function()
