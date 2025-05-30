@@ -202,7 +202,7 @@ local function createKeyAuthSystem()
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(255, 20, 147) -- Bright neon pink
+    SubmitButton.TextColor3 = Color3.fromRGB(255, 0, 255) -- Bright neon magenta/pink
     SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255) -- Bright cyan neon
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
