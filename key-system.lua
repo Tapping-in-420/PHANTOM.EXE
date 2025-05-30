@@ -107,17 +107,7 @@ local function createKeyAuthSystem()
     corner.CornerRadius = UDim.new(0, 15)
     corner.Parent = Frame
     
-    -- Glow effect
-    local glow = Instance.new("Frame")
-    glow.Parent = ScreenGui
-    glow.Size = UDim2.new(1, 8, 1, 8)
-    glow.Position = UDim2.new(0, -4, 0, -4)
-    glow.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
-    glow.BackgroundTransparency = 0.8
-    glow.ZIndex = Frame.ZIndex - 1
-    local glowCorner = Instance.new("UICorner")
-    glowCorner.CornerRadius = UDim.new(0, 18)
-    glowCorner.Parent = glow
+    -- No glow effect
     
     -- Title
     Title.Parent = Frame
@@ -261,7 +251,6 @@ local function createKeyAuthSystem()
             StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
             SubmitButton.Text = "🎉 Loading Phantom.exe..."
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-            glow.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
             
             wait(2)
             ScreenGui:Destroy()
@@ -275,13 +264,8 @@ local function createKeyAuthSystem()
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
             LicenseBox.TextEditable = true
             LicenseBox.Text = ""
-            glow.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
             
-            -- Reset glow color after 2 seconds
-            wait(2)
-            if glow.Parent then
-                glow.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
-            end
+            -- Reset after 2 seconds
         end
     end)
     
