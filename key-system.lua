@@ -82,6 +82,7 @@ local function createKeyAuthSystem()
     -- Create GUI
     local ScreenGui = Instance.new("ScreenGui")
     local Frame = Instance.new("Frame")
+    local BackgroundImage = Instance.new("ImageLabel")
     local LicenseBox = Instance.new("TextBox")
     local SubmitButton = Instance.new("TextButton")
     local Title = Instance.new("TextLabel")
@@ -115,7 +116,22 @@ local function createKeyAuthSystem()
     stroke.Transparency = 0.3
     stroke.Parent = Frame
     
-    -- Title (Neon styled)
+    -- Background Image (Replace the URL with your desired neon futuristic background)
+    BackgroundImage.Parent = Frame
+    BackgroundImage.Size = UDim2.new(1, 0, 1, 0)
+    BackgroundImage.Position = UDim2.new(0, 0, 0, 0)
+    BackgroundImage.Image = "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" -- Replace with your image URL
+    BackgroundImage.BackgroundTransparency = 1
+    BackgroundImage.ImageTransparency = 0.3 -- Semi-transparent overlay
+    BackgroundImage.ScaleType = Enum.ScaleType.Crop
+    BackgroundImage.ZIndex = 1
+    
+    -- Add corner radius to background image
+    local bgCorner = Instance.new("UICorner")
+    bgCorner.CornerRadius = UDim.new(0, 20)
+    bgCorner.Parent = BackgroundImage
+    
+    -- Title (Neon styled) - Higher ZIndex to appear above background
     Title.Parent = Frame
     Title.Size = UDim2.new(1, 0, 0, 60)
     Title.Position = UDim2.new(0, 0, 0, 15)
@@ -124,6 +140,7 @@ local function createKeyAuthSystem()
     Title.BackgroundTransparency = 1
     Title.TextSize = 22
     Title.Font = Enum.Font.GothamBold
+    Title.ZIndex = 2
     
     -- Add text stroke for neon glow
     local titleStroke = Instance.new("UIStroke")
@@ -142,6 +159,7 @@ local function createKeyAuthSystem()
     InfoLabel.TextSize = 12
     InfoLabel.Font = Enum.Font.Gotham
     InfoLabel.TextWrapped = true
+    InfoLabel.ZIndex = 2
     
     -- HWID Display (Futuristic style)
     HWIDLabel.Parent = Frame
@@ -152,6 +170,7 @@ local function createKeyAuthSystem()
     HWIDLabel.BackgroundTransparency = 1
     HWIDLabel.TextSize = 9
     HWIDLabel.Font = Enum.Font.Gotham
+    HWIDLabel.ZIndex = 2
     
     -- License Input (Neon styled)
     LicenseBox.Parent = Frame
@@ -166,6 +185,7 @@ local function createKeyAuthSystem()
     LicenseBox.TextSize = 14
     LicenseBox.Font = Enum.Font.Gotham
     LicenseBox.ClearTextOnFocus = false
+    LicenseBox.ZIndex = 2
     
     local licenseCorner = Instance.new("UICorner")
     licenseCorner.CornerRadius = UDim.new(0, 12)
@@ -177,44 +197,45 @@ local function createKeyAuthSystem()
     licenseStroke.Transparency = 0.7
     licenseStroke.Parent = LicenseBox
     
-    -- Submit Button (Bright glossy neon style)
+    -- Submit Button (GLOOMY DARK STYLE)
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SubmitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
+    SubmitButton.TextColor3 = Color3.fromRGB(200, 200, 200) -- Muted text color
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(25, 25, 35) -- Dark gloomy background
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
+    SubmitButton.ZIndex = 2
     
     local buttonCorner = Instance.new("UICorner")
     buttonCorner.CornerRadius = UDim.new(0, 12)
     buttonCorner.Parent = SubmitButton
     
     local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(255, 100, 255)
+    buttonStroke.Color = Color3.fromRGB(60, 60, 80) -- Dark stroke
     buttonStroke.Thickness = 2
-    buttonStroke.Transparency = 0.2
+    buttonStroke.Transparency = 0.3
     buttonStroke.Parent = SubmitButton
     
-    -- Add bright glossy gradient effect
+    -- Add dark gloomy gradient effect
     local buttonGradient = Instance.new("UIGradient")
     buttonGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 255)),   -- Bright at top
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)), -- Pure magenta in middle
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 200))    -- Slightly darker at bottom
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 50)),   -- Slightly lighter at top
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(25, 25, 35)), -- Dark in middle
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 25))    -- Darkest at bottom
     }
     buttonGradient.Rotation = 90 -- Vertical gradient
     buttonGradient.Parent = SubmitButton
     
-    -- Add bright shine/highlight effect
+    -- Add subtle dark shine effect
     local shineFrame = Instance.new("Frame")
     shineFrame.Parent = SubmitButton
-    shineFrame.Size = UDim2.new(1, 0, 0.4, 0)
+    shineFrame.Size = UDim2.new(1, 0, 0.3, 0)
     shineFrame.Position = UDim2.new(0, 0, 0, 0)
-    shineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    shineFrame.BackgroundTransparency = 0.5
+    shineFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    shineFrame.BackgroundTransparency = 0.8
     shineFrame.BorderSizePixel = 0
     shineFrame.ZIndex = SubmitButton.ZIndex + 1
     
@@ -224,27 +245,28 @@ local function createKeyAuthSystem()
     
     local shineGradient = Instance.new("UIGradient")
     shineGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 100)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 40, 60))
     }
     shineGradient.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.3),  -- Visible bright shine at top
+        NumberSequenceKeypoint.new(0, 0.7),  -- Subtle shine at top
         NumberSequenceKeypoint.new(1, 1)     -- Fade to invisible
     }
     shineGradient.Rotation = 90
     shineGradient.Parent = shineFrame
     
-    -- Hover effect for button
+    -- Hover effect for button (darker gloomy style)
     SubmitButton.MouseEnter:Connect(function()
         buttonGradient.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 150, 255)),  -- Even brighter at top
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 50, 255)), -- Bright in middle
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))     -- Bright at bottom
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(45, 45, 60)),  -- Slightly lighter on hover
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(35, 35, 45)), 
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 25, 35))
         }
         buttonStroke.Thickness = 3
-        buttonStroke.Color = Color3.fromRGB(255, 255, 255)
+        buttonStroke.Color = Color3.fromRGB(80, 80, 100)
+        SubmitButton.TextColor3 = Color3.fromRGB(220, 220, 220)
         shineGradient.Transparency = NumberSequence.new{
-            NumberSequenceKeypoint.new(0, 0.1),  -- More intense shine on hover
+            NumberSequenceKeypoint.new(0, 0.5),  -- More visible shine on hover
             NumberSequenceKeypoint.new(1, 1)
         }
     end)
@@ -252,14 +274,15 @@ local function createKeyAuthSystem()
     SubmitButton.MouseLeave:Connect(function()
         if SubmitButton.Text == "Activate License" then
             buttonGradient.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 255)),
-                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 200))
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 50)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(25, 25, 35)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 25))
             }
             buttonStroke.Thickness = 2
-            buttonStroke.Color = Color3.fromRGB(255, 100, 255)
+            buttonStroke.Color = Color3.fromRGB(60, 60, 80)
+            SubmitButton.TextColor3 = Color3.fromRGB(200, 200, 200)
             shineGradient.Transparency = NumberSequence.new{
-                NumberSequenceKeypoint.new(0, 0.3),
+                NumberSequenceKeypoint.new(0, 0.7),
                 NumberSequenceKeypoint.new(1, 1)
             }
         end
@@ -275,6 +298,7 @@ local function createKeyAuthSystem()
     StatusLabel.TextSize = 11
     StatusLabel.Font = Enum.Font.Gotham
     StatusLabel.TextWrapped = true
+    StatusLabel.ZIndex = 2
     
     -- Initialize KeyAuth on startup
     local sessionid, initMessage = initializeKeyAuth()
@@ -286,7 +310,7 @@ local function createKeyAuthSystem()
         StatusLabel.Text = "Failed to connect to KeyAuth: " .. (initMessage or "Unknown error")
         StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
         SubmitButton.Text = "Connection Failed"
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 50)
+        SubmitButton.BackgroundColor3 = Color3.fromRGB(50, 25, 25)
         LicenseBox.PlaceholderText = "KeyAuth connection failed..."
         return
     end
@@ -321,7 +345,7 @@ local function createKeyAuthSystem()
         StatusLabel.Text = "Validating license with KeyAuth servers..."
         StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
         SubmitButton.Text = "Validating..."
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 50, 0)
+        SubmitButton.BackgroundColor3 = Color3.fromRGB(40, 30, 20)
         LicenseBox.TextEditable = false
         
         wait(0.8) -- Realistic delay
@@ -332,7 +356,7 @@ local function createKeyAuthSystem()
             StatusLabel.Text = message
             StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
             SubmitButton.Text = "Loading Phantom.exe..."
-            SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 100)
+            SubmitButton.BackgroundColor3 = Color3.fromRGB(20, 40, 30)
             
             wait(2)
             ScreenGui:Destroy()
@@ -343,7 +367,7 @@ local function createKeyAuthSystem()
             StatusLabel.Text = "License validation failed: " .. message
             StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
             SubmitButton.Text = "Activate License"
-            SubmitButton.BackgroundColor3 = Color3.fromRGB(50, 0, 100)
+            SubmitButton.BackgroundColor3 = Color3.fromRGB(35, 20, 30)
             LicenseBox.TextEditable = true
             LicenseBox.Text = ""
         end
