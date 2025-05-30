@@ -177,14 +177,15 @@ local function createKeyAuthSystem()
     licenseStroke.Transparency = 0.7
     licenseStroke.Parent = LicenseBox
     
-    -- Submit Button (Bright glossy neon style)
+    -- Submit Button (Simple style like the text box)
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
     SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white text
-    SubmitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
-    SubmitButton.BorderSizePixel = 0
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(10, 15, 35) -- Same as text box
+    SubmitButton.BorderSizePixel = 2
+    SubmitButton.BorderColor3 = Color3.fromRGB(0, 150, 255) -- Same as text box
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
     
@@ -193,53 +194,10 @@ local function createKeyAuthSystem()
     buttonCorner.Parent = SubmitButton
     
     local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(255, 100, 255)
-    buttonStroke.Thickness = 2
-    buttonStroke.Transparency = 0.2
+    buttonStroke.Color = Color3.fromRGB(255, 0, 255)
+    buttonStroke.Thickness = 1
+    buttonStroke.Transparency = 0.7
     buttonStroke.Parent = SubmitButton
-    
-    -- Add neon white glow effect to button text
-    local buttonTextStroke = Instance.new("UIStroke")
-    buttonTextStroke.Color = Color3.fromRGB(255, 255, 255) -- Pure white glow
-    buttonTextStroke.Thickness = 2
-    buttonTextStroke.Transparency = 0.3
-    buttonTextStroke.Parent = SubmitButton
-    
-    -- Add bright glossy gradient effect
-    local buttonGradient = Instance.new("UIGradient")
-    buttonGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 255)),   -- Bright at top
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)), -- Pure magenta in middle
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 200))    -- Slightly darker at bottom
-    }
-    buttonGradient.Rotation = 90 -- Vertical gradient
-    buttonGradient.Parent = SubmitButton
-    
-    -- Add bright shine/highlight effect
-    local shineFrame = Instance.new("Frame")
-    shineFrame.Parent = SubmitButton
-    shineFrame.Size = UDim2.new(1, 0, 0.4, 0)
-    shineFrame.Position = UDim2.new(0, 0, 0, 0)
-    shineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    shineFrame.BackgroundTransparency = 0.5
-    shineFrame.BorderSizePixel = 0
-    shineFrame.ZIndex = SubmitButton.ZIndex + 1
-    
-    local shineCorner = Instance.new("UICorner")
-    shineCorner.CornerRadius = UDim.new(0, 12)
-    shineCorner.Parent = shineFrame
-    
-    local shineGradient = Instance.new("UIGradient")
-    shineGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
-    }
-    shineGradient.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.3),  -- Visible bright shine at top
-        NumberSequenceKeypoint.new(1, 1)     -- Fade to invisible
-    }
-    shineGradient.Rotation = 90
-    shineGradient.Parent = shineFrame
     
     -- Hover effect for button
     SubmitButton.MouseEnter:Connect(function()
