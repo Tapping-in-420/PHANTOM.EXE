@@ -119,7 +119,7 @@ local function createKeyAuthSystem()
     Title.Parent = Frame
     Title.Size = UDim2.new(1, 0, 0, 60)
     Title.Position = UDim2.new(0, 0, 0, 15)
-    Title.Text = "🔐 PHANTOM.EXE LICENSE"
+    Title.Text = " PHANTOM.EXE LICENSE"
     Title.TextColor3 = Color3.fromRGB(0, 255, 255)
     Title.BackgroundTransparency = 1
     Title.TextSize = 22
