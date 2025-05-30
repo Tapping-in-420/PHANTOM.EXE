@@ -2,7 +2,7 @@
 local function createKeySystem()
     local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
     local APP_ID = "34033"
-    local APP_SECRET = "BDzsD5aoli0c70lFcSDm1YgfmVqfaqWa573" -- Your app secret from earlier
+    local APP_SECRET = "BDzsD5aoli0c70IFcSDm1YgfmVqfagWa573" -- Your app secret from earlier
     
     local function validateLicense(licenseKey)
         -- Auth.gg license validation endpoint (AIO style)
