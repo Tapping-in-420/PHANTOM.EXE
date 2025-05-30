@@ -1,14 +1,14 @@
--- Phantom Key System for Roblox
--- Replace your Keyauth system with this
+-- Phantom Key System with HTTP Bypass
+-- Works even when HttpService is disabled
 
 local PhantomKeySystem = {}
 
 -- Configuration
 local CONFIG = {
-    API_URL = "https://2d7e5e66-d814-4c12-9524-99dc13ca819e-00-1hy2gw53vhuk4.picard.replit.dev", -- Replace with your Replit URL
+    API_URL = "https://2d7e5e66-d814-4c12-9524-99dc13ca819e-00-1hy2gw53vhuk4.picard.replit.dev",
     APP_NAME = "Phantom Executor",
     VERSION = "1.0",
-    DISCORD_INVITE = "https://discord.gg/DZcZXe8TNa" -- Your actual Discord invite 
+    DISCORD_INVITE = "https://discord.gg/yourserver"
 }
 
 -- Services
@@ -16,6 +16,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local MarketplaceService = game:GetService("MarketplaceService")
 
 -- Variables
 local LocalPlayer = Players.LocalPlayer
@@ -23,45 +24,139 @@ local playerHWID = nil
 local isValidated = false
 local keySystemGUI = nil
 
--- HWID Generation (unique per user)
+-- HWID Generation
 local function generateHWID()
     local hwid = LocalPlayer.UserId .. "_" .. game.JobId:sub(1, 8)
-    -- Add more unique identifiers for better security
     if game.PlaceId then
         hwid = hwid .. "_" .. tostring(game.PlaceId):sub(1, 6)
     end
     return hwid
 end
 
--- HTTP Request function with error handling
+-- HTTP Request with multiple bypass methods
 local function makeRequest(endpoint, method, data)
     method = method or "GET"
+    local url = CONFIG.API_URL .. endpoint
     
-    local success, response = pcall(function()
-        if method == "GET" then
-            return HttpService:GetAsync(CONFIG.API_URL .. endpoint)
-        elseif method == "POST" then
-            return HttpService:PostAsync(
-                CONFIG.API_URL .. endpoint,
-                HttpService:JSONEncode(data or {}),
-                Enum.HttpContentType.ApplicationJson
-            )
-        end
-    end)
-    
-    if success then
-        local jsonSuccess, jsonData = pcall(function()
-            return HttpService:JSONDecode(response)
+    -- Method 1: Try standard HttpService
+    local function tryStandardHttp()
+        local success, response = pcall(function()
+            if method == "GET" then
+                return HttpService:GetAsync(url)
+            elseif method == "POST" then
+                return HttpService:PostAsync(url, HttpService:JSONEncode(data or {}), Enum.HttpContentType.ApplicationJson)
+            end
         end)
         
-        if jsonSuccess then
-            return true, jsonData
-        else
-            return false, "Invalid JSON response"
+        if success then
+            local jsonSuccess, jsonData = pcall(function()
+                return HttpService:JSONDecode(response)
+            end)
+            return jsonSuccess, jsonData
         end
-    else
-        return false, response
+        return false, nil
     end
+    
+    -- Method 2: Try using game:HttpGet (some executors support this)
+    local function tryGameHttpGet()
+        if not game.HttpGet then return false, nil end
+        
+        local success, response = pcall(function()
+            return game:HttpGet(url)
+        end)
+        
+        if success then
+            local jsonSuccess, jsonData = pcall(function()
+                return HttpService:JSONDecode(response)
+            end)
+            return jsonSuccess, jsonData
+        end
+        return false, nil
+    end
+    
+    -- Method 3: Try syn.request (Synapse X)
+    local function trySynRequest()
+        if not syn or not syn.request then return false, nil end
+        
+        local success, response = pcall(function()
+            return syn.request({
+                Url = url,
+                Method = method,
+                Headers = method == "POST" and {["Content-Type"] = "application/json"} or {},
+                Body = method == "POST" and HttpService:JSONEncode(data or {}) or nil
+            })
+        end)
+        
+        if success and response.Success then
+            local jsonSuccess, jsonData = pcall(function()
+                return HttpService:JSONDecode(response.Body)
+            end)
+            return jsonSuccess, jsonData
+        end
+        return false, nil
+    end
+    
+    -- Method 4: Try http_request (universal)
+    local function tryHttpRequest()
+        if not http_request then return false, nil end
+        
+        local success, response = pcall(function()
+            return http_request({
+                Url = url,
+                Method = method,
+                Headers = method == "POST" and {["Content-Type"] = "application/json"} or {},
+                Body = method == "POST" and HttpService:JSONEncode(data or {}) or nil
+            })
+        end)
+        
+        if success and response.Success then
+            local jsonSuccess, jsonData = pcall(function()
+                return HttpService:JSONDecode(response.Body)
+            end)
+            return jsonSuccess, jsonData
+        end
+        return false, nil
+    end
+    
+    -- Method 5: Try request (KRNL/other executors)
+    local function tryRequest()
+        if not request then return false, nil end
+        
+        local success, response = pcall(function()
+            return request({
+                Url = url,
+                Method = method,
+                Headers = method == "POST" and {["Content-Type"] = "application/json"} or {},
+                Body = method == "POST" and HttpService:JSONEncode(data or {}) or nil
+            })
+        end)
+        
+        if success and response.Success then
+            local jsonSuccess, jsonData = pcall(function()
+                return HttpService:JSONDecode(response.Body)
+            end)
+            return jsonSuccess, jsonData
+        end
+        return false, nil
+    end
+    
+    -- Try all methods in order
+    local methods = {
+        tryStandardHttp,
+        tryGameHttpGet,
+        trySynRequest,
+        tryHttpRequest,
+        tryRequest
+    }
+    
+    for i, method_func in ipairs(methods) do
+        local success, response = method_func()
+        if success and response then
+            return true, response
+        end
+    end
+    
+    return false, "All HTTP methods failed"
 end
 
 -- Key validation function
@@ -76,7 +171,7 @@ local function validateKey(key, hwid)
     end
 end
 
--- Create modern GUI
+-- Create modern GUI (same as before but with better error handling)
 local function createKeySystemGUI()
     -- Destroy existing GUI if it exists
     if keySystemGUI then
@@ -131,7 +226,7 @@ local function createKeySystemGUI()
     headerCorner.CornerRadius = UDim.new(0, 12)
     headerCorner.Parent = headerFrame
     
-    -- Fix header corners (bottom should be square)
+    -- Fix header corners
     local headerBottomFix = Instance.new("Frame")
     headerBottomFix.Parent = headerFrame
     headerBottomFix.Position = UDim2.new(0, 0, 0.7, 0)
@@ -262,6 +357,19 @@ local function createKeySystemGUI()
     discordCorner.CornerRadius = UDim.new(0, 6)
     discordCorner.Parent = discordButton
     
+    -- Bypass method label
+    local bypassLabel = Instance.new("TextLabel")
+    bypassLabel.Name = "BypassLabel"
+    bypassLabel.Parent = contentFrame
+    bypassLabel.Position = UDim2.new(0, 20, 1, -50)
+    bypassLabel.Size = UDim2.new(1, -40, 0, 15)
+    bypassLabel.BackgroundTransparency = 1
+    bypassLabel.Text = "HTTP Bypass: Checking methods..."
+    bypassLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+    bypassLabel.TextSize = 10
+    bypassLabel.Font = Enum.Font.Gotham
+    bypassLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
     -- HWID Label
     local hwidLabel = Instance.new("TextLabel")
     hwidLabel.Name = "HWIDLabel"
@@ -275,21 +383,52 @@ local function createKeySystemGUI()
     hwidLabel.Font = Enum.Font.Gotham
     hwidLabel.TextXAlignment = Enum.TextXAlignment.Left
     
+    -- Check available HTTP methods
+    local function checkHttpMethods()
+        local methods = {}
+        
+        if HttpService then table.insert(methods, "HttpService") end
+        if game.HttpGet then table.insert(methods, "game:HttpGet") end
+        if syn and syn.request then table.insert(methods, "syn.request") end
+        if http_request then table.insert(methods, "http_request") end
+        if request then table.insert(methods, "request") end
+        
+        if #methods > 0 then
+            bypassLabel.Text = "HTTP Methods: " .. table.concat(methods, ", ")
+            bypassLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+        else
+            bypassLabel.Text = "HTTP Methods: None available"
+            bypassLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+        end
+    end
+    
+    checkHttpMethods()
+    
     -- Event handlers
     closeButton.MouseButton1Click:Connect(function()
         keySystemGUI:Destroy()
     end)
     
     getKeyButton.MouseButton1Click:Connect(function()
-        setclipboard(CONFIG.DISCORD_INVITE)
-        statusLabel.Text = "Discord invite copied to clipboard!"
-        statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+        if setclipboard then
+            setclipboard(CONFIG.DISCORD_INVITE)
+            statusLabel.Text = "Discord invite copied to clipboard!"
+            statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+        else
+            statusLabel.Text = "Discord: " .. CONFIG.DISCORD_INVITE
+            statusLabel.TextColor3 = Color3.fromRGB(102, 126, 234)
+        end
     end)
     
     discordButton.MouseButton1Click:Connect(function()
-        setclipboard(CONFIG.DISCORD_INVITE)
-        statusLabel.Text = "Discord invite copied to clipboard!"
-        statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+        if setclipboard then
+            setclipboard(CONFIG.DISCORD_INVITE)
+            statusLabel.Text = "Discord invite copied to clipboard!"
+            statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+        else
+            statusLabel.Text = "Discord: " .. CONFIG.DISCORD_INVITE
+            statusLabel.TextColor3 = Color3.fromRGB(102, 126, 234)
+        end
     end)
     
     validateButton.MouseButton1Click:Connect(function()
@@ -305,44 +444,46 @@ local function createKeySystemGUI()
         validateButton.Text = "Validating..."
         validateButton.BackgroundColor3 = Color3.fromRGB(156, 163, 175)
         
-        statusLabel.Text = "Validating key..."
+        statusLabel.Text = "Validating key with bypass methods..."
         statusLabel.TextColor3 = Color3.fromRGB(251, 191, 36)
         
-        -- Validate key
-        local isValid, reason, timeLeft = validateKey(key, playerHWID)
-        
-        if isValid then
-            statusLabel.Text = "✅ Key validated successfully!"
-            statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+        -- Validate key with bypass
+        spawn(function()
+            local isValid, reason, timeLeft = validateKey(key, playerHWID)
             
-            validateButton.Text = "Success!"
-            validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
-            
-            -- Show time left if available
-            if timeLeft and timeLeft > 0 then
-                local days = math.floor(timeLeft / (24 * 60 * 60 * 1000))
-                local hours = math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
+            if isValid then
+                statusLabel.Text = "✅ Key validated successfully!"
+                statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
                 
-                if days > 0 then
-                    statusLabel.Text = statusLabel.Text .. " (Expires in " .. days .. "d " .. hours .. "h)"
-                else
-                    statusLabel.Text = statusLabel.Text .. " (Expires in " .. hours .. "h)"
+                validateButton.Text = "Success!"
+                validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
+                
+                -- Show time left if available
+                if timeLeft and timeLeft > 0 then
+                    local days = math.floor(timeLeft / (24 * 60 * 60 * 1000))
+                    local hours = math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
+                    
+                    if days > 0 then
+                        statusLabel.Text = statusLabel.Text .. " (Expires in " .. days .. "d " .. hours .. "h)"
+                    else
+                        statusLabel.Text = statusLabel.Text .. " (Expires in " .. hours .. "h)"
+                    end
                 end
+                
+                isValidated = true
+                
+                -- Close GUI after 2 seconds
+                wait(2)
+                keySystemGUI:Destroy()
+                
+            else
+                statusLabel.Text = "❌ " .. reason
+                statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+                
+                validateButton.Text = "Validate Key"
+                validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
             end
-            
-            isValidated = true
-            
-            -- Close GUI after 2 seconds
-            wait(2)
-            keySystemGUI:Destroy()
-            
-        else
-            statusLabel.Text = "❌ " .. reason
-            statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
-            
-            validateButton.Text = "Validate Key"
-            validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
-        end
+        end)
     end)
     
     -- Enter key to validate
@@ -352,7 +493,7 @@ local function createKeySystemGUI()
         end
     end)
     
-    -- Make draggable
+    -- Make draggable (same as before)
     local dragToggle = nil
     local dragSpeed = 0.25
     local dragStart = nil
@@ -405,11 +546,8 @@ function PhantomKeySystem.init()
     -- Generate HWID
     playerHWID = generateHWID()
     
-    print("🔑 Phantom Key System Initialized")
+    print("🔑 Phantom Key System Initialized (HTTP Bypass)")
     print("HWID: " .. playerHWID)
-    
-    -- Check if already validated (optional: save to file)
-    -- For now, always show key system
     
     -- Create and show GUI
     createKeySystemGUI()
