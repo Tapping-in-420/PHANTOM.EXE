@@ -89,6 +89,11 @@ local function createKeyAuthSystem()
     local HWIDLabel = Instance.new("TextLabel")
     local InfoLabel = Instance.new("TextLabel")
     
+    -- Create animated background frames for wave effect
+    local WaveFrame1 = Instance.new("Frame")
+    local WaveFrame2 = Instance.new("Frame")
+    local WaveFrame3 = Instance.new("Frame")
+    
     ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     ScreenGui.Name = "PhantomKeyAuthLicense"
     ScreenGui.ResetOnSpawn = false
@@ -101,13 +106,79 @@ local function createKeyAuthSystem()
     Frame.BorderSizePixel = 0
     Frame.Active = true
     Frame.Draggable = true
+    Frame.ClipsDescendants = true
     
-    -- Add corner radius and shadow
+    -- Add corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 15)
     corner.Parent = Frame
     
-    -- No glow effect
+    -- Wave Layer 1 (Bottom layer - darkest)
+    WaveFrame1.Parent = Frame
+    WaveFrame1.Size = UDim2.new(2, 0, 1.2, 0)
+    WaveFrame1.Position = UDim2.new(-0.5, 0, -0.1, 0)
+    WaveFrame1.BackgroundColor3 = Color3.fromRGB(8, 8, 15)
+    WaveFrame1.BorderSizePixel = 0
+    WaveFrame1.ZIndex = 1
+    
+    local waveCorner1 = Instance.new("UICorner")
+    waveCorner1.CornerRadius = UDim.new(0, 15)
+    waveCorner1.Parent = WaveFrame1
+    
+    -- Wave Layer 2 (Middle layer)
+    WaveFrame2.Parent = Frame
+    WaveFrame2.Size = UDim2.new(2, 0, 1.2, 0)
+    WaveFrame2.Position = UDim2.new(-0.5, 0, -0.1, 0)
+    WaveFrame2.BackgroundColor3 = Color3.fromRGB(25, 15, 35)
+    WaveFrame2.BorderSizePixel = 0
+    WaveFrame2.ZIndex = 2
+    WaveFrame2.BackgroundTransparency = 0.3
+    
+    local waveCorner2 = Instance.new("UICorner")
+    waveCorner2.CornerRadius = UDim.new(0, 15)
+    waveCorner2.Parent = WaveFrame2
+    
+    -- Wave Layer 3 (Top layer - purple tint)
+    WaveFrame3.Parent = Frame
+    WaveFrame3.Size = UDim2.new(2, 0, 1.2, 0)
+    WaveFrame3.Position = UDim2.new(-0.5, 0, -0.1, 0)
+    WaveFrame3.BackgroundColor3 = Color3.fromRGB(45, 25, 65)
+    WaveFrame3.BorderSizePixel = 0
+    WaveFrame3.ZIndex = 3
+    WaveFrame3.BackgroundTransparency = 0.6
+    
+    local waveCorner3 = Instance.new("UICorner")
+    waveCorner3.CornerRadius = UDim.new(0, 15)
+    waveCorner3.Parent = WaveFrame3
+    
+    -- Create wave animations
+    local TweenService = game:GetService("TweenService")
+    
+    -- Wave 1 Animation (Slow horizontal movement)
+    local wave1Tween = TweenService:Create(
+        WaveFrame1,
+        TweenInfo.new(8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        {Position = UDim2.new(-0.3, 0, -0.15, 0)}
+    )
+    
+    -- Wave 2 Animation (Medium speed, opposite direction)
+    local wave2Tween = TweenService:Create(
+        WaveFrame2,
+        TweenInfo.new(6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        {Position = UDim2.new(-0.7, 0, -0.05, 0)}
+    )
+    
+    -- Wave 3 Animation (Fast, vertical movement)
+    local wave3Tween = TweenService:Create(
+        WaveFrame3,
+        TweenInfo.new(4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        {Position = UDim2.new(-0.4, 0, -0.2, 0)}
+    )
+    
+    -- Start wave animations
+    wave1Tween:Play()
+    wave2Tween:Play()
+    wave3Tween:Play()
     
     -- Title
     Title.Parent = Frame
@@ -118,6 +189,7 @@ local function createKeyAuthSystem()
     Title.BackgroundTransparency = 1
     Title.TextSize = 24
     Title.Font = Enum.Font.GothamBold
+    Title.ZIndex = 10
     
     -- Info Label
     InfoLabel.Parent = Frame
@@ -129,6 +201,7 @@ local function createKeyAuthSystem()
     InfoLabel.TextSize = 12
     InfoLabel.Font = Enum.Font.Gotham
     InfoLabel.TextWrapped = true
+    InfoLabel.ZIndex = 10
     
     -- HWID Display
     HWIDLabel.Parent = Frame
@@ -139,6 +212,7 @@ local function createKeyAuthSystem()
     HWIDLabel.BackgroundTransparency = 1
     HWIDLabel.TextSize = 9
     HWIDLabel.Font = Enum.Font.Gotham
+    HWIDLabel.ZIndex = 10
     
     -- License Input
     LicenseBox.Parent = Frame
@@ -152,21 +226,23 @@ local function createKeyAuthSystem()
     LicenseBox.TextSize = 14
     LicenseBox.Font = Enum.Font.Gotham
     LicenseBox.ClearTextOnFocus = false
+    LicenseBox.ZIndex = 10
     
     local licenseCorner = Instance.new("UICorner")
     licenseCorner.CornerRadius = UDim.new(0, 8)
     licenseCorner.Parent = LicenseBox
     
-    -- Submit Button
+    -- Submit Button (REMOVED ROCKET EMOJI)
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
-    SubmitButton.Text = "🚀 Activate License"
+    SubmitButton.Text = "Activate License"
     SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
+    SubmitButton.ZIndex = 10
     
     local buttonCorner = Instance.new("UICorner")
     buttonCorner.CornerRadius = UDim.new(0, 8)
@@ -178,7 +254,7 @@ local function createKeyAuthSystem()
     end)
     
     SubmitButton.MouseLeave:Connect(function()
-        if SubmitButton.Text == "🚀 Activate License" then
+        if SubmitButton.Text == "Activate License" then
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
         end
     end)
@@ -193,6 +269,7 @@ local function createKeyAuthSystem()
     StatusLabel.TextSize = 11
     StatusLabel.Font = Enum.Font.Gotham
     StatusLabel.TextWrapped = true
+    StatusLabel.ZIndex = 10
     
     -- Initialize KeyAuth on startup
     local sessionid, initMessage = initializeKeyAuth()
@@ -203,7 +280,7 @@ local function createKeyAuthSystem()
     else
         StatusLabel.Text = "❌ Failed to connect to KeyAuth: " .. (initMessage or "Unknown error")
         StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        SubmitButton.Text = "⚠️ Connection Failed"
+        SubmitButton.Text = "Connection Failed"
         SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
         LicenseBox.PlaceholderText = "KeyAuth connection failed..."
         return
@@ -238,7 +315,7 @@ local function createKeyAuthSystem()
         -- Update UI for validation
         StatusLabel.Text = "🔄 Validating license with KeyAuth servers..."
         StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-        SubmitButton.Text = "⏳ Validating..."
+        SubmitButton.Text = "Validating..."
         SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
         LicenseBox.TextEditable = false
         
@@ -249,7 +326,7 @@ local function createKeyAuthSystem()
         if success then
             StatusLabel.Text = "✅ " .. message
             StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-            SubmitButton.Text = "🎉 Loading Phantom.exe..."
+            SubmitButton.Text = "Loading Phantom.exe..."
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
             
             wait(2)
@@ -260,7 +337,7 @@ local function createKeyAuthSystem()
         else
             StatusLabel.Text = "❌ License validation failed:\n" .. message
             StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            SubmitButton.Text = "🚀 Activate License"
+            SubmitButton.Text = "Activate License"
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
             LicenseBox.TextEditable = true
             LicenseBox.Text = ""
