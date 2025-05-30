@@ -186,7 +186,7 @@ local function createKeySystemGUI()
     keySystemGUI.ResetOnSpawn = false
     keySystemGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     
-    -- Main Frame (no background blur)
+    -- Main Frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
     mainFrame.Parent = keySystemGUI
@@ -242,24 +242,25 @@ local function createKeySystemGUI()
     accentCorner.CornerRadius = UDim.new(0, 22)
     accentCorner.Parent = accentBorder
     
-    -- Header Section
+    -- Header Section (Centered Layout)
     local headerFrame = Instance.new("Frame")
     headerFrame.Name = "Header"
     headerFrame.Parent = mainFrame
-    headerFrame.Size = UDim2.new(1, 0, 0, 70)
+    headerFrame.Size = UDim2.new(1, 0, 0, 80)
     headerFrame.BackgroundTransparency = 1
     
-    -- Logo/Icon
+    -- Ghost Logo (centered at top)
     local logoFrame = Instance.new("Frame")
     logoFrame.Name = "Logo"
     logoFrame.Parent = headerFrame
-    logoFrame.Position = UDim2.new(0, 25, 0, 15)
-    logoFrame.Size = UDim2.new(0, 40, 0, 40)
+    logoFrame.AnchorPoint = Vector2.new(0.5, 0)
+    logoFrame.Position = UDim2.new(0.5, 0, 0, 10)
+    logoFrame.Size = UDim2.new(0, 45, 0, 45)
     logoFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     logoFrame.BorderSizePixel = 0
     
     local logoCorner = Instance.new("UICorner")
-    logoCorner.CornerRadius = UDim.new(0, 10)
+    logoCorner.CornerRadius = UDim.new(0, 12)
     logoCorner.Parent = logoFrame
     
     local logoGradient = Instance.new("UIGradient")
@@ -270,43 +271,46 @@ local function createKeySystemGUI()
     }
     logoGradient.Rotation = 45
     
+    -- Ghost emoji as placeholder (you can replace this)
     local logoText = Instance.new("TextLabel")
     logoText.Name = "LogoText"
     logoText.Parent = logoFrame
     logoText.Size = UDim2.new(1, 0, 1, 0)
     logoText.BackgroundTransparency = 1
-    logoText.Text = "🔑"
+    logoText.Text = "👻"  -- Ghost emoji - you can change this
     logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
     logoText.TextScaled = true
     logoText.Font = Enum.Font.GothamBold
     
-    -- Title
+    -- Title (centered)
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Parent = headerFrame
-    titleLabel.Position = UDim2.new(0, 75, 0, 10)
-    titleLabel.Size = UDim2.new(0, 280, 0, 25)
+    titleLabel.AnchorPoint = Vector2.new(0.5, 0)
+    titleLabel.Position = UDim2.new(0.5, 0, 0, 35)
+    titleLabel.Size = UDim2.new(0, 400, 0, 25)
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = CONFIG.APP_NAME
+    titleLabel.Text = "Phantom.exe"
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     titleLabel.TextSize = 22
     titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Center
     
-    -- Subtitle
+    -- Subtitle (centered)
     local subtitleLabel = Instance.new("TextLabel")
     subtitleLabel.Name = "Subtitle"
     subtitleLabel.Parent = headerFrame
-    subtitleLabel.Position = UDim2.new(0, 75, 0, 35)
-    subtitleLabel.Size = UDim2.new(0, 280, 0, 20)
+    subtitleLabel.AnchorPoint = Vector2.new(0.5, 0)
+    subtitleLabel.Position = UDim2.new(0.5, 0, 0, 60)
+    subtitleLabel.Size = UDim2.new(0, 400, 0, 15)
     subtitleLabel.BackgroundTransparency = 1
     subtitleLabel.Text = "Advanced Key Authentication System"
     subtitleLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
     subtitleLabel.TextSize = 13
     subtitleLabel.Font = Enum.Font.Gotham
-    subtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     
-    -- Close button
+    -- Close button (top right)
     local closeButton = Instance.new("TextButton")
     closeButton.Name = "CloseButton"
     closeButton.Parent = headerFrame
@@ -328,15 +332,15 @@ local function createKeySystemGUI()
     local contentFrame = Instance.new("Frame")
     contentFrame.Name = "Content"
     contentFrame.Parent = mainFrame
-    contentFrame.Position = UDim2.new(0, 0, 0, 70)
-    contentFrame.Size = UDim2.new(1, 0, 1, -70)
+    contentFrame.Position = UDim2.new(0, 0, 0, 80)
+    contentFrame.Size = UDim2.new(1, 0, 1, -80)
     contentFrame.BackgroundTransparency = 1
     
     -- Status label
     local statusLabel = Instance.new("TextLabel")
     statusLabel.Name = "StatusLabel"
     statusLabel.Parent = contentFrame
-    statusLabel.Position = UDim2.new(0, 30, 0, 20)
+    statusLabel.Position = UDim2.new(0, 30, 0, 15)
     statusLabel.Size = UDim2.new(1, -60, 0, 25)
     statusLabel.BackgroundTransparency = 1
     statusLabel.Text = "Enter your authentication key to continue"
@@ -349,7 +353,7 @@ local function createKeySystemGUI()
     local inputContainer = Instance.new("Frame")
     inputContainer.Name = "InputContainer"
     inputContainer.Parent = contentFrame
-    inputContainer.Position = UDim2.new(0, 30, 0, 55)
+    inputContainer.Position = UDim2.new(0, 30, 0, 45)
     inputContainer.Size = UDim2.new(1, -60, 0, 45)
     inputContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
     inputContainer.BorderSizePixel = 0
@@ -362,7 +366,7 @@ local function createKeySystemGUI()
     local inputBorder = Instance.new("Frame")
     inputBorder.Name = "InputBorder"
     inputBorder.Parent = contentFrame
-    inputBorder.Position = UDim2.new(0, 28, 0, 53)
+    inputBorder.Position = UDim2.new(0, 28, 0, 43)
     inputBorder.Size = UDim2.new(1, -56, 0, 49)
     inputBorder.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     inputBorder.BackgroundTransparency = 0.7
@@ -393,7 +397,7 @@ local function createKeySystemGUI()
     local validateButton = Instance.new("TextButton")
     validateButton.Name = "ValidateButton"
     validateButton.Parent = contentFrame
-    validateButton.Position = UDim2.new(0, 30, 0, 115)
+    validateButton.Position = UDim2.new(0, 30, 0, 105)
     validateButton.Size = UDim2.new(1, -60, 0, 45)
     validateButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     validateButton.Text = "Authenticate Key"
@@ -418,7 +422,7 @@ local function createKeySystemGUI()
     local buttonContainer = Instance.new("Frame")
     buttonContainer.Name = "ButtonContainer"
     buttonContainer.Parent = contentFrame
-    buttonContainer.Position = UDim2.new(0, 30, 0, 175)
+    buttonContainer.Position = UDim2.new(0, 30, 0, 165)
     buttonContainer.Size = UDim2.new(1, -60, 0, 35)
     buttonContainer.BackgroundTransparency = 1
     
@@ -460,7 +464,7 @@ local function createKeySystemGUI()
     local infoFrame = Instance.new("Frame")
     infoFrame.Name = "InfoFrame"
     infoFrame.Parent = contentFrame
-    infoFrame.Position = UDim2.new(0, 30, 0, 220)
+    infoFrame.Position = UDim2.new(0, 30, 0, 210)
     infoFrame.Size = UDim2.new(1, -60, 0, 50)
     infoFrame.BackgroundTransparency = 1
     
