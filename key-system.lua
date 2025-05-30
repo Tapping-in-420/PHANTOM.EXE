@@ -31,7 +31,7 @@ local function createKeyAuthSystem()
             end)
             
             if parseSuccess and data.success then
-                print("✅ Key system initialized successfully")
+                print("✅ KeyAuth initialized successfully")
                 return data.sessionid, data.message
             else
                 print("❌ KeyAuth init failed:", data.message or "Unknown error")
@@ -292,6 +292,7 @@ local function createKeyAuthSystem()
         end
     end)
     
+    print("✅ KeyAuth License-Only system loaded successfully")
     print("📋 App Name:", KEYAUTH_CONFIG.name)
     print("👤 Owner ID:", KEYAUTH_CONFIG.ownerid)
     print("🔑 Session ID:", sessionid or "Failed to initialize")
