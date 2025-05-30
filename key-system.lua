@@ -4,7 +4,7 @@ local function createKeySystem()
     local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
     
     -- Your Auth.gg App ID (replace 34033 with yours if different)
-    local APP_ID = "BDzsD5aoli0c70IFcSDm1YgfmVqfagWa573"
+    local APP_ID = "34033"
     
     -- Function to check if key is valid
     local function checkKey(key)
