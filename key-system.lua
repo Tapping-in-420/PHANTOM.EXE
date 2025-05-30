@@ -207,7 +207,7 @@ local function createKeyAuthSystem()
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
-    SubmitButton.ZIndex = 2
+    SubmitButton.ZIndex = 10  -- Much higher ZIndex to appear above shine
     
     local buttonCorner = Instance.new("UICorner")
     buttonCorner.CornerRadius = UDim.new(0, 12)
@@ -237,7 +237,7 @@ local function createKeyAuthSystem()
     shineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     shineFrame.BackgroundTransparency = 0.6  -- Balanced transparency
     shineFrame.BorderSizePixel = 0
-    shineFrame.ZIndex = SubmitButton.ZIndex + 1
+    shineFrame.ZIndex = SubmitButton.ZIndex - 1  -- Keep shine below the button text
     
     local shineCorner = Instance.new("UICorner")
     shineCorner.CornerRadius = UDim.new(0, 12)
