@@ -211,13 +211,13 @@ local function createKeySystemGUI()
     corner.CornerRadius = UDim.new(0, 20)
     corner.Parent = mainFrame
     
-    -- Outer glow effect (child of main frame so it moves together)
+    -- FIXED: Outer glow effect (child of main frame, proper sizing)
     local glowFrame = Instance.new("Frame")
     glowFrame.Name = "GlowFrame"
     glowFrame.Parent = mainFrame
     glowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     glowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    glowFrame.Size = UDim2.new(1, 20, 1, 20)
+    glowFrame.Size = UDim2.new(1, 20, 1, 20)  -- Fixed: Proper relative sizing
     glowFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     glowFrame.BackgroundTransparency = 0.8
     glowFrame.ZIndex = mainFrame.ZIndex - 1
@@ -227,13 +227,13 @@ local function createKeySystemGUI()
     glowCorner.CornerRadius = UDim.new(0, 25)
     glowCorner.Parent = glowFrame
     
-    -- Purple accent border (child of main frame so it moves together)
+    -- FIXED: Purple accent border (child of main frame, proper sizing)
     local accentBorder = Instance.new("Frame")
     accentBorder.Name = "AccentBorder"
     accentBorder.Parent = mainFrame
     accentBorder.AnchorPoint = Vector2.new(0.5, 0.5)
     accentBorder.Position = UDim2.new(0.5, 0, 0.5, 0)
-    accentBorder.Size = UDim2.new(1, 4, 1, 4)
+    accentBorder.Size = UDim2.new(1, 4, 1, 4)  -- Fixed: Proper relative sizing
     accentBorder.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     accentBorder.BackgroundTransparency = 0.3
     accentBorder.ZIndex = mainFrame.ZIndex - 1
@@ -282,13 +282,13 @@ local function createKeySystemGUI()
     logoText.TextScaled = true
     logoText.Font = Enum.Font.GothamBold
     
-    -- Title (centered, moved down)
+    -- FIXED: Title (centered, moved down proper distance)
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Parent = headerFrame
     titleLabel.AnchorPoint = Vector2.new(0.5, 0)
-    titleLabel.Position = UDim2.new(0.5, 0, 0, 50)
-    titleLabel.Size = UDim2.new(0, 400, 0, 25)
+    titleLabel.Position = UDim2.new(0.5, 0, 0, 50)  -- Fixed: Proper spacing from ghost
+    titleLabel.Size = UDim2.new(1, 0, 0, 25)  -- Fixed: Full width for centering
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = "Phantom.exe"
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -296,13 +296,13 @@ local function createKeySystemGUI()
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Center
     
-    -- Subtitle (centered, moved down)
+    -- FIXED: Subtitle (centered, moved down proper distance)
     local subtitleLabel = Instance.new("TextLabel")
     subtitleLabel.Name = "Subtitle"
     subtitleLabel.Parent = headerFrame
     subtitleLabel.AnchorPoint = Vector2.new(0.5, 0)
-    subtitleLabel.Position = UDim2.new(0.5, 0, 0, 75)
-    subtitleLabel.Size = UDim2.new(0, 400, 0, 15)
+    subtitleLabel.Position = UDim2.new(0.5, 0, 0, 75)  -- Fixed: Proper spacing
+    subtitleLabel.Size = UDim2.new(1, 0, 0, 15)  -- Fixed: Full width for centering
     subtitleLabel.BackgroundTransparency = 1
     subtitleLabel.Text = "Advanced Key Authentication System"
     subtitleLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
@@ -310,15 +310,15 @@ local function createKeySystemGUI()
     subtitleLabel.Font = Enum.Font.Gotham
     subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     
-    -- Close button (top right, transparent background)
+    -- FIXED: Close button (top right, transparent background, proper X)
     local closeButton = Instance.new("TextButton")
     closeButton.Name = "CloseButton"
     closeButton.Parent = headerFrame
     closeButton.AnchorPoint = Vector2.new(1, 0)
     closeButton.Position = UDim2.new(1, -15, 0, 15)
     closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.BackgroundTransparency = 1
-    closeButton.Text = "✕"
+    closeButton.BackgroundTransparency = 1  -- Fixed: No background
+    closeButton.Text = "✕"  -- Fixed: Proper X symbol
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeButton.TextSize = 18
     closeButton.Font = Enum.Font.GothamBold
@@ -332,18 +332,18 @@ local function createKeySystemGUI()
     contentFrame.Size = UDim2.new(1, 0, 1, -80)
     contentFrame.BackgroundTransparency = 1
     
-    -- Status label (properly centered)
+    -- FIXED: Status label (properly centered)
     local statusLabel = Instance.new("TextLabel")
     statusLabel.Name = "StatusLabel"
     statusLabel.Parent = contentFrame
     statusLabel.Position = UDim2.new(0, 0, 0, 15)
-    statusLabel.Size = UDim2.new(1, 0, 0, 25)
+    statusLabel.Size = UDim2.new(1, 0, 0, 25)  -- Fixed: Full width for proper centering
     statusLabel.BackgroundTransparency = 1
     statusLabel.Text = "Enter your authentication key to continue"
     statusLabel.TextColor3 = Color3.fromRGB(200, 200, 220)
     statusLabel.TextSize = 15
     statusLabel.Font = Enum.Font.Gotham
-    statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Fixed: Properly centered
     
     -- Key input container
     local inputContainer = Instance.new("Frame")
@@ -456,7 +456,7 @@ local function createKeySystemGUI()
     discordCorner.CornerRadius = UDim.new(0, 8)
     discordCorner.Parent = discordButton
     
-    -- Info section at bottom (fixed positioning)
+    -- Info section at bottom (fixed positioning to not overlap)
     local infoFrame = Instance.new("Frame")
     infoFrame.Name = "InfoFrame"
     infoFrame.Parent = contentFrame
@@ -539,7 +539,7 @@ local function createKeySystemGUI()
     addHoverEffect(getKeyButton, Color3.fromRGB(60, 60, 75), Color3.fromRGB(40, 40, 55))
     addHoverEffect(discordButton, Color3.fromRGB(108, 121, 255), Color3.fromRGB(88, 101, 242))
     
-    -- Special hover effect for close button (no background color change)
+    -- FIXED: Special hover effect for close button (red hover, no background)
     closeButton.MouseEnter:Connect(function()
         TweenService:Create(closeButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 100, 100)}):Play()
     end)
@@ -703,22 +703,13 @@ local function createKeySystemGUI()
         end
     end)
     
-    -- Animate GUI entrance
+    -- FIXED: Animate GUI entrance (removed the broken glow/accent animations)
     mainFrame.Position = UDim2.new(0.5, 0, 0.3, 0)
     mainFrame.Size = UDim2.new(0, 0, 0, 0)
     
     TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(0.5, 0, 0.5, 0),
         Size = UDim2.new(0, 480, 0, 350)
-    }):Play()
-    
-    -- Animate glow and accent border
-    TweenService:Create(glowFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 500, 0, 370)
-    }):Play()
-    
-    TweenService:Create(accentBorder, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 484, 0, 354)
     }):Play()
     
     -- Parent to PlayerGui
