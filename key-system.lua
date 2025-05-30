@@ -1,5 +1,5 @@
--- Correct Auth.gg AIO License System for Phantom.exe
-print("🚀 Starting Phantom.exe Auth.gg AIO system...")
+-- Auth.gg Login Method for License Validation
+print("🚀 Starting Phantom.exe Auth.gg Login Method...")
 
 local function createKeySystem()
     local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
@@ -12,38 +12,49 @@ local function createKeySystem()
     print("✅ App ID:", APP_ID)
     print("✅ HWID:", hwid)
     
-    -- Auth.gg AIO (All-In-One) License Validation
+    -- Auth.gg License Validation using Login Method
     local function validateLicense(licenseKey)
-        print("🔍 Validating license with Auth.gg AIO:", licenseKey)
+        print("🔍 Validating license with Auth.gg Login Method:", licenseKey)
         
         local success, result = pcall(function()
             local url = "https://api.auth.gg/v1/"
             
-            -- Method 1: AIO License Check (recommended by Auth.gg)
-            local postData = "type=license&aid=" .. APP_ID .. "&secret=" .. APP_SECRET .. "&license=" .. licenseKey .. "&hwid=" .. hwid
+            -- Method 1: Test if app is working
+            local infoData = "type=info&aid=" .. APP_ID .. "&secret=" .. APP_SECRET
+            print("📡 Testing connection:", infoData)
             
-            print("📡 AIO Request URL:", url)
-            print("📤 AIO POST data:", postData)
+            local infoResponse = game:HttpGet(url .. "?" .. infoData, true)
+            print("📥 Info response:", infoResponse)
             
-            local response = game:HttpGet(url .. "?" .. postData, true)
-            print("📥 AIO Raw response:", response)
+            local infoResult = game:GetService("HttpService"):JSONDecode(infoResponse)
+            if infoResult.status ~= "Enabled" then
+                print("❌ Application not enabled")
+                return false
+            end
             
-            if response and response ~= "" then
-                local data = game:GetService("HttpService"):JSONDecode(response)
-                print("📊 AIO Parsed data:", data)
+            print("✅ Application is enabled, trying login with license as credentials")
+            
+            -- Method 2: Use license as both username and password
+            local loginData = "type=login&aid=" .. APP_ID .. "&secret=" .. APP_SECRET .. "&username=" .. licenseKey .. "&password=" .. licenseKey .. "&hwid=" .. hwid
+            print("📡 Login attempt:", loginData)
+            
+            local loginResponse = game:HttpGet(url .. "?" .. loginData, true)
+            print("📥 Login response:", loginResponse)
+            
+            if loginResponse and loginResponse ~= "" then
+                local loginResult = game:GetService("HttpService"):JSONDecode(loginResponse)
+                print("📊 Login result:", loginResult)
                 
-                -- Check for success indicators
-                if data.result == "success" or data.status == "success" then
-                    print("✅ AIO License validation successful!")
+                if loginResult.result == "success" then
+                    print("✅ Login successful!")
                     return true
-                elseif data.message then
-                    print("❌ Auth.gg AIO message:", data.message)
+                else
+                    print("❌ Login failed:", loginResult.message or "Unknown error")
                     
-                    -- Try alternative method if AIO fails
-                    print("🔄 Trying alternative registration method...")
-                    
-                    local regData = "type=register&aid=" .. APP_ID .. "&secret=" .. APP_SECRET .. "&username=" .. licenseKey .. "&password=" .. licenseKey .. "&email=user@example.com&license=" .. licenseKey .. "&hwid=" .. hwid
-                    print("📤 Registration data:", regData)
+                    -- Method 3: Try register if login fails
+                    print("🔄 Trying registration...")
+                    local regData = "type=register&aid=" .. APP_ID .. "&secret=" .. APP_SECRET .. "&username=" .. licenseKey .. "&password=" .. licenseKey .. "&email=user@domain.com&license=" .. licenseKey .. "&hwid=" .. hwid
+                    print("📡 Registration attempt:", regData)
                     
                     local regResponse = game:HttpGet(url .. "?" .. regData, true)
                     print("📥 Registration response:", regResponse)
@@ -55,6 +66,8 @@ local function createKeySystem()
                         if regResult.result == "success" then
                             print("✅ Registration successful!")
                             return true
+                        else
+                            print("❌ Registration failed:", regResult.message or "Unknown error")
                         end
                     end
                 end
@@ -81,7 +94,7 @@ local function createKeySystem()
     local InfoLabel = Instance.new("TextLabel")
     
     ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-    ScreenGui.Name = "PhantomAuthGGAIO"
+    ScreenGui.Name = "PhantomAuthGGLogin"
     ScreenGui.ResetOnSpawn = false
     
     -- Main Frame
@@ -110,7 +123,7 @@ local function createKeySystem()
     InfoLabel.Parent = Frame
     InfoLabel.Size = UDim2.new(0.9, 0, 0, 40)
     InfoLabel.Position = UDim2.new(0.05, 0, 0.18, 0)
-    InfoLabel.Text = "Protected by Auth.gg with HWID locking & expiration"
+    InfoLabel.Text = "Using Auth.gg Login Method for License Validation"
     InfoLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
     InfoLabel.BackgroundTransparency = 1
     InfoLabel.TextSize = 12
@@ -152,7 +165,7 @@ local function createKeySystem()
     StatusLabel.Parent = Frame
     StatusLabel.Size = UDim2.new(0.9, 0, 0, 60)
     StatusLabel.Position = UDim2.new(0.05, 0, 0.73, 0)
-    StatusLabel.Text = "Ready to validate license with Auth.gg..."
+    StatusLabel.Text = "Ready to validate license..."
     StatusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
     StatusLabel.BackgroundTransparency = 1
     StatusLabel.TextSize = 12
@@ -180,7 +193,7 @@ local function createKeySystem()
             return
         end
         
-        StatusLabel.Text = "🔄 Validating license with Auth.gg AIO method..."
+        StatusLabel.Text = "🔄 Validating license with Auth.gg Login Method..."
         StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
         SubmitButton.Text = "Validating..."
         SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
@@ -188,7 +201,7 @@ local function createKeySystem()
         wait(1)
         
         if validateLicense(licenseKey) then
-            StatusLabel.Text = "✅ License valid! HWID locked. Loading Phantom.exe..."
+            StatusLabel.Text = "✅ License valid! Loading Phantom.exe..."
             StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
             SubmitButton.Text = "Loading Script..."
             
@@ -197,7 +210,7 @@ local function createKeySystem()
             
             loadstring(game:HttpGet('https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/refs/heads/main/PHANTOM.EXE'))()
         else
-            StatusLabel.Text = "❌ Invalid license, expired, or HWID mismatch! Check console (F9)."
+            StatusLabel.Text = "❌ Invalid license! Check console (F9) for details."
             StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
             SubmitButton.Text = "🚀 Validate License"
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
@@ -206,7 +219,7 @@ local function createKeySystem()
     end)
     
     TextBox:CaptureFocus()
-    print("✅ Auth.gg AIO system loaded!")
+    print("✅ Auth.gg Login Method system loaded!")
 end
 
 local success, error = pcall(createKeySystem)
