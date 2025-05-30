@@ -194,10 +194,10 @@ local function createKeySystemGUI()
     mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     mainFrame.Size = UDim2.new(0, 480, 0, 350)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
     mainFrame.BorderSizePixel = 0
     
-    -- Main frame gradient
+    -- Main frame gradient (dark black/gray, not purple)
     local mainGradient = Instance.new("UIGradient")
     mainGradient.Parent = mainFrame
     mainGradient.Color = ColorSequence.new{
