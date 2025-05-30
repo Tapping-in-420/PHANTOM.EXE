@@ -197,13 +197,13 @@ local function createKeyAuthSystem()
     licenseStroke.Transparency = 0.7
     licenseStroke.Parent = LicenseBox
     
-    -- Submit Button (GLOOMY DARK STYLE)
+    -- Submit Button (BRIGHT GLOSSY NEON STYLE)
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(200, 200, 200) -- Muted text color
-    SubmitButton.BackgroundColor3 = Color3.fromRGB(25, 25, 35) -- Dark gloomy background
+    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Bright white text
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255) -- Bright cyan neon
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
@@ -214,28 +214,28 @@ local function createKeyAuthSystem()
     buttonCorner.Parent = SubmitButton
     
     local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(60, 60, 80) -- Dark stroke
+    buttonStroke.Color = Color3.fromRGB(100, 255, 255) -- Bright cyan stroke
     buttonStroke.Thickness = 2
-    buttonStroke.Transparency = 0.3
+    buttonStroke.Transparency = 0.2
     buttonStroke.Parent = SubmitButton
     
-    -- Add dark gloomy gradient effect
+    -- Add bright glossy gradient effect
     local buttonGradient = Instance.new("UIGradient")
     buttonGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 50)),   -- Slightly lighter at top
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(25, 25, 35)), -- Dark in middle
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 25))    -- Darkest at bottom
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 255, 255)),  -- Bright cyan at top
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),  -- Pure cyan in middle
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 200))     -- Slightly darker cyan at bottom
     }
     buttonGradient.Rotation = 90 -- Vertical gradient
     buttonGradient.Parent = SubmitButton
     
-    -- Add subtle dark shine effect
+    -- Add bright shine/highlight effect
     local shineFrame = Instance.new("Frame")
     shineFrame.Parent = SubmitButton
-    shineFrame.Size = UDim2.new(1, 0, 0.3, 0)
+    shineFrame.Size = UDim2.new(1, 0, 0.4, 0)
     shineFrame.Position = UDim2.new(0, 0, 0, 0)
-    shineFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-    shineFrame.BackgroundTransparency = 0.8
+    shineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    shineFrame.BackgroundTransparency = 0.5
     shineFrame.BorderSizePixel = 0
     shineFrame.ZIndex = SubmitButton.ZIndex + 1
     
@@ -245,12 +245,12 @@ local function createKeyAuthSystem()
     
     local shineGradient = Instance.new("UIGradient")
     shineGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 100)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 40, 60))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
     }
     shineGradient.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.7),  -- Subtle shine at top
-        NumberSequenceKeypoint.new(1, 1)     -- Fade to invisible
+        ColorSequenceKeypoint.new(0, 0.3),  -- Visible bright shine at top
+        ColorSequenceKeypoint.new(1, 1)     -- Fade to invisible
     }
     shineGradient.Rotation = 90
     shineGradient.Parent = shineFrame
