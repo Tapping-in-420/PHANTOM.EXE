@@ -182,7 +182,7 @@ local function createKeyAuthSystem()
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white text
     SubmitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
@@ -197,6 +197,13 @@ local function createKeyAuthSystem()
     buttonStroke.Thickness = 2
     buttonStroke.Transparency = 0.2
     buttonStroke.Parent = SubmitButton
+    
+    -- Add neon white glow effect to button text
+    local buttonTextStroke = Instance.new("UIStroke")
+    buttonTextStroke.Color = Color3.fromRGB(255, 255, 255) -- Pure white glow
+    buttonTextStroke.Thickness = 2
+    buttonTextStroke.Transparency = 0.3
+    buttonTextStroke.Parent = SubmitButton
     
     -- Add bright glossy gradient effect
     local buttonGradient = Instance.new("UIGradient")
@@ -243,6 +250,8 @@ local function createKeyAuthSystem()
         }
         buttonStroke.Thickness = 3
         buttonStroke.Color = Color3.fromRGB(255, 255, 255)
+        buttonTextStroke.Thickness = 3 -- Increase white glow on hover
+        buttonTextStroke.Transparency = 0.1 -- Make glow more intense
         shineGradient.Transparency = NumberSequence.new{
             NumberSequenceKeypoint.new(0, 0.1),  -- More intense shine on hover
             NumberSequenceKeypoint.new(1, 1)
@@ -258,6 +267,8 @@ local function createKeyAuthSystem()
             }
             buttonStroke.Thickness = 2
             buttonStroke.Color = Color3.fromRGB(255, 100, 255)
+            buttonTextStroke.Thickness = 2 -- Reset white glow
+            buttonTextStroke.Transparency = 0.3 -- Reset glow intensity
             shineGradient.Transparency = NumberSequence.new{
                 NumberSequenceKeypoint.new(0, 0.3),
                 NumberSequenceKeypoint.new(1, 1)
