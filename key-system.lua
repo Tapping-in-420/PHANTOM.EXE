@@ -5,7 +5,7 @@ local PhantomKeySystem = {}
 
 -- Configuration
 local CONFIG = {
-    API_URL = "https://2d7e5e66-d814-4c12-9524-99dc13ca819e-00-1hy2gw53vhuk4.picard.replit.dev:3000/",
+    API_URL = "https://2d7e5e66-d814-4c12-9524-99dc13ca819e-00-1hy2gw53vhuk4.picard.replit.dev:3000",
     APP_NAME = "Phantom Executor",
     VERSION = "1.0",
     DISCORD_INVITE = "https://discord.gg/yourserver"
@@ -171,7 +171,9 @@ local function validateKey(key, hwid)
     end
 end
 
--- Create modern GUI (same as before but with better error handling)
+-- ==================================================================================
+-- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
+-- ==================================================================================
 local function createKeySystemGUI()
     -- Destroy existing GUI if it exists
     if keySystemGUI then
@@ -184,204 +186,332 @@ local function createKeySystemGUI()
     keySystemGUI.ResetOnSpawn = false
     keySystemGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     
+    -- Background blur effect
+    local blurFrame = Instance.new("Frame")
+    blurFrame.Name = "BlurBackground"
+    blurFrame.Parent = keySystemGUI
+    blurFrame.Size = UDim2.new(1, 0, 1, 0)
+    blurFrame.Position = UDim2.new(0, 0, 0, 0)
+    blurFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    blurFrame.BackgroundTransparency = 0.3
+    blurFrame.BorderSizePixel = 0
+    
     -- Main Frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
     mainFrame.Parent = keySystemGUI
     mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    mainFrame.Size = UDim2.new(0, 450, 0, 320)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    mainFrame.Size = UDim2.new(0, 500, 0, 380)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
     mainFrame.BorderSizePixel = 0
+    
+    -- Main frame gradient
+    local mainGradient = Instance.new("UIGradient")
+    mainGradient.Parent = mainFrame
+    mainGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 15))
+    }
+    mainGradient.Rotation = 45
     
     -- Rounded corners
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
+    corner.CornerRadius = UDim.new(0, 20)
     corner.Parent = mainFrame
     
-    -- Drop shadow effect
-    local shadow = Instance.new("Frame")
-    shadow.Name = "Shadow"
-    shadow.Parent = keySystemGUI
-    shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-    shadow.Position = UDim2.new(0.5, 0, 0.5, 5)
-    shadow.Size = UDim2.new(0, 460, 0, 330)
-    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    shadow.BackgroundTransparency = 0.7
-    shadow.ZIndex = mainFrame.ZIndex - 1
+    -- Outer glow effect
+    local glowFrame = Instance.new("Frame")
+    glowFrame.Name = "GlowFrame"
+    glowFrame.Parent = keySystemGUI
+    glowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    glowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    glowFrame.Size = UDim2.new(0, 520, 0, 400)
+    glowFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    glowFrame.BackgroundTransparency = 0.8
+    glowFrame.ZIndex = mainFrame.ZIndex - 1
+    glowFrame.BorderSizePixel = 0
     
-    local shadowCorner = Instance.new("UICorner")
-    shadowCorner.CornerRadius = UDim.new(0, 12)
-    shadowCorner.Parent = shadow
+    local glowCorner = Instance.new("UICorner")
+    glowCorner.CornerRadius = UDim.new(0, 25)
+    glowCorner.Parent = glowFrame
     
-    -- Header
+    -- Purple accent border
+    local accentBorder = Instance.new("Frame")
+    accentBorder.Name = "AccentBorder"
+    accentBorder.Parent = keySystemGUI
+    accentBorder.AnchorPoint = Vector2.new(0.5, 0.5)
+    accentBorder.Position = UDim2.new(0.5, 0, 0.5, 0)
+    accentBorder.Size = UDim2.new(0, 504, 0, 384)
+    accentBorder.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    accentBorder.BackgroundTransparency = 0.3
+    accentBorder.ZIndex = mainFrame.ZIndex - 1
+    accentBorder.BorderSizePixel = 0
+    
+    local accentCorner = Instance.new("UICorner")
+    accentCorner.CornerRadius = UDim.new(0, 22)
+    accentCorner.Parent = accentBorder
+    
+    -- Header Section
     local headerFrame = Instance.new("Frame")
     headerFrame.Name = "Header"
     headerFrame.Parent = mainFrame
-    headerFrame.Size = UDim2.new(1, 0, 0, 60)
-    headerFrame.BackgroundColor3 = Color3.fromRGB(102, 126, 234)
-    headerFrame.BorderSizePixel = 0
+    headerFrame.Size = UDim2.new(1, 0, 0, 80)
+    headerFrame.BackgroundTransparency = 1
     
-    local headerCorner = Instance.new("UICorner")
-    headerCorner.CornerRadius = UDim.new(0, 12)
-    headerCorner.Parent = headerFrame
+    -- Logo/Icon
+    local logoFrame = Instance.new("Frame")
+    logoFrame.Name = "Logo"
+    logoFrame.Parent = headerFrame
+    logoFrame.Position = UDim2.new(0, 30, 0, 20)
+    logoFrame.Size = UDim2.new(0, 40, 0, 40)
+    logoFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    logoFrame.BorderSizePixel = 0
     
-    -- Fix header corners
-    local headerBottomFix = Instance.new("Frame")
-    headerBottomFix.Parent = headerFrame
-    headerBottomFix.Position = UDim2.new(0, 0, 0.7, 0)
-    headerBottomFix.Size = UDim2.new(1, 0, 0.3, 0)
-    headerBottomFix.BackgroundColor3 = Color3.fromRGB(102, 126, 234)
-    headerBottomFix.BorderSizePixel = 0
+    local logoCorner = Instance.new("UICorner")
+    logoCorner.CornerRadius = UDim.new(0, 10)
+    logoCorner.Parent = logoFrame
+    
+    local logoGradient = Instance.new("UIGradient")
+    logoGradient.Parent = logoFrame
+    logoGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(186, 85, 211)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(138, 43, 226))
+    }
+    logoGradient.Rotation = 45
+    
+    local logoText = Instance.new("TextLabel")
+    logoText.Name = "LogoText"
+    logoText.Parent = logoFrame
+    logoText.Size = UDim2.new(1, 0, 1, 0)
+    logoText.BackgroundTransparency = 1
+    logoText.Text = "🔑"
+    logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    logoText.TextScaled = true
+    logoText.Font = Enum.Font.GothamBold
     
     -- Title
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Parent = headerFrame
-    titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    titleLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    titleLabel.Size = UDim2.new(0.8, 0, 0.8, 0)
+    titleLabel.Position = UDim2.new(0, 85, 0, 15)
+    titleLabel.Size = UDim2.new(0, 300, 0, 25)
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = "🔑 " .. CONFIG.APP_NAME .. " Key System"
+    titleLabel.Text = CONFIG.APP_NAME
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.TextScaled = true
+    titleLabel.TextSize = 24
     titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- Subtitle
+    local subtitleLabel = Instance.new("TextLabel")
+    subtitleLabel.Name = "Subtitle"
+    subtitleLabel.Parent = headerFrame
+    subtitleLabel.Position = UDim2.new(0, 85, 0, 40)
+    subtitleLabel.Size = UDim2.new(0, 300, 0, 20)
+    subtitleLabel.BackgroundTransparency = 1
+    subtitleLabel.Text = "Advanced Key Authentication System"
+    subtitleLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
+    subtitleLabel.TextSize = 14
+    subtitleLabel.Font = Enum.Font.Gotham
+    subtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     
     -- Close button
     local closeButton = Instance.new("TextButton")
     closeButton.Name = "CloseButton"
     closeButton.Parent = headerFrame
     closeButton.AnchorPoint = Vector2.new(1, 0)
-    closeButton.Position = UDim2.new(1, -10, 0, 10)
+    closeButton.Position = UDim2.new(1, -20, 0, 20)
     closeButton.Size = UDim2.new(0, 40, 0, 40)
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 59, 59)
+    closeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     closeButton.Text = "✕"
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.TextScaled = true
+    closeButton.TextSize = 18
     closeButton.Font = Enum.Font.GothamBold
     closeButton.BorderSizePixel = 0
     
     local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.CornerRadius = UDim.new(0, 10)
     closeCorner.Parent = closeButton
     
     -- Content Frame
     local contentFrame = Instance.new("Frame")
     contentFrame.Name = "Content"
     contentFrame.Parent = mainFrame
-    contentFrame.Position = UDim2.new(0, 0, 0, 60)
-    contentFrame.Size = UDim2.new(1, 0, 1, -60)
+    contentFrame.Position = UDim2.new(0, 0, 0, 80)
+    contentFrame.Size = UDim2.new(1, 0, 1, -80)
     contentFrame.BackgroundTransparency = 1
     
     -- Status label
     local statusLabel = Instance.new("TextLabel")
     statusLabel.Name = "StatusLabel"
     statusLabel.Parent = contentFrame
-    statusLabel.Position = UDim2.new(0, 20, 0, 20)
-    statusLabel.Size = UDim2.new(1, -40, 0, 30)
+    statusLabel.Position = UDim2.new(0, 40, 0, 30)
+    statusLabel.Size = UDim2.new(1, -80, 0, 25)
     statusLabel.BackgroundTransparency = 1
-    statusLabel.Text = "Enter your key to continue:"
-    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    statusLabel.Text = "Enter your authentication key to continue"
+    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 220)
     statusLabel.TextSize = 16
     statusLabel.Font = Enum.Font.Gotham
     statusLabel.TextXAlignment = Enum.TextXAlignment.Left
     
+    -- Key input container
+    local inputContainer = Instance.new("Frame")
+    inputContainer.Name = "InputContainer"
+    inputContainer.Parent = contentFrame
+    inputContainer.Position = UDim2.new(0, 40, 0, 70)
+    inputContainer.Size = UDim2.new(1, -80, 0, 50)
+    inputContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    inputContainer.BorderSizePixel = 0
+    
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 12)
+    inputCorner.Parent = inputContainer
+    
+    -- Input border gradient
+    local inputBorder = Instance.new("Frame")
+    inputBorder.Name = "InputBorder"
+    inputBorder.Parent = contentFrame
+    inputBorder.Position = UDim2.new(0, 38, 0, 68)
+    inputBorder.Size = UDim2.new(1, -76, 0, 54)
+    inputBorder.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    inputBorder.BackgroundTransparency = 0.7
+    inputBorder.ZIndex = inputContainer.ZIndex - 1
+    inputBorder.BorderSizePixel = 0
+    
+    local inputBorderCorner = Instance.new("UICorner")
+    inputBorderCorner.CornerRadius = UDim.new(0, 14)
+    inputBorderCorner.Parent = inputBorder
+    
     -- Key input
     local keyInput = Instance.new("TextBox")
     keyInput.Name = "KeyInput"
-    keyInput.Parent = contentFrame
-    keyInput.Position = UDim2.new(0, 20, 0, 60)
-    keyInput.Size = UDim2.new(1, -40, 0, 40)
-    keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-    keyInput.BorderSizePixel = 0
+    keyInput.Parent = inputContainer
+    keyInput.Position = UDim2.new(0, 15, 0, 0)
+    keyInput.Size = UDim2.new(1, -30, 1, 0)
+    keyInput.BackgroundTransparency = 1
     keyInput.Text = ""
-    keyInput.PlaceholderText = "Enter your key here (e.g., ABCD-1234-EFGH-5678)"
-    keyInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+    keyInput.PlaceholderText = "XXXX-XXXX-XXXX-XXXX"
+    keyInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 120)
     keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    keyInput.TextSize = 14
-    keyInput.Font = Enum.Font.Gotham
+    keyInput.TextSize = 16
+    keyInput.Font = Enum.Font.GothamMedium
     keyInput.ClearTextOnFocus = false
-    
-    local inputCorner = Instance.new("UICorner")
-    inputCorner.CornerRadius = UDim.new(0, 6)
-    inputCorner.Parent = keyInput
+    keyInput.TextXAlignment = Enum.TextXAlignment.Center
     
     -- Validate button
     local validateButton = Instance.new("TextButton")
     validateButton.Name = "ValidateButton"
     validateButton.Parent = contentFrame
-    validateButton.Position = UDim2.new(0, 20, 0, 120)
-    validateButton.Size = UDim2.new(1, -40, 0, 40)
-    validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
-    validateButton.Text = "Validate Key"
+    validateButton.Position = UDim2.new(0, 40, 0, 140)
+    validateButton.Size = UDim2.new(1, -80, 0, 50)
+    validateButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    validateButton.Text = "Authenticate Key"
     validateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    validateButton.TextSize = 16
+    validateButton.TextSize = 18
     validateButton.Font = Enum.Font.GothamBold
     validateButton.BorderSizePixel = 0
     
     local validateCorner = Instance.new("UICorner")
-    validateCorner.CornerRadius = UDim.new(0, 6)
+    validateCorner.CornerRadius = UDim.new(0, 12)
     validateCorner.Parent = validateButton
+    
+    local validateGradient = Instance.new("UIGradient")
+    validateGradient.Parent = validateButton
+    validateGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(186, 85, 211)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(138, 43, 226))
+    }
+    validateGradient.Rotation = 45
+    
+    -- Button container for Get Key and Discord
+    local buttonContainer = Instance.new("Frame")
+    buttonContainer.Name = "ButtonContainer"
+    buttonContainer.Parent = contentFrame
+    buttonContainer.Position = UDim2.new(0, 40, 0, 210)
+    buttonContainer.Size = UDim2.new(1, -80, 0, 40)
+    buttonContainer.BackgroundTransparency = 1
     
     -- Get key button
     local getKeyButton = Instance.new("TextButton")
     getKeyButton.Name = "GetKeyButton"
-    getKeyButton.Parent = contentFrame
-    getKeyButton.Position = UDim2.new(0, 20, 0, 170)
-    getKeyButton.Size = UDim2.new(0.48, -10, 0, 35)
-    getKeyButton.BackgroundColor3 = Color3.fromRGB(102, 126, 234)
-    getKeyButton.Text = "Get Key"
+    getKeyButton.Parent = buttonContainer
+    getKeyButton.Position = UDim2.new(0, 0, 0, 0)
+    getKeyButton.Size = UDim2.new(0.48, 0, 1, 0)
+    getKeyButton.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+    getKeyButton.Text = "🔑 Get Key"
     getKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     getKeyButton.TextSize = 14
     getKeyButton.Font = Enum.Font.Gotham
     getKeyButton.BorderSizePixel = 0
     
     local getKeyCorner = Instance.new("UICorner")
-    getKeyCorner.CornerRadius = UDim.new(0, 6)
+    getKeyCorner.CornerRadius = UDim.new(0, 8)
     getKeyCorner.Parent = getKeyButton
     
     -- Discord button
     local discordButton = Instance.new("TextButton")
     discordButton.Name = "DiscordButton"
-    discordButton.Parent = contentFrame
-    discordButton.Position = UDim2.new(0.52, 10, 0, 170)
-    discordButton.Size = UDim2.new(0.48, -10, 0, 35)
+    discordButton.Parent = buttonContainer
+    discordButton.Position = UDim2.new(0.52, 0, 0, 0)
+    discordButton.Size = UDim2.new(0.48, 0, 1, 0)
     discordButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-    discordButton.Text = "Discord"
+    discordButton.Text = "💬 Discord"
     discordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     discordButton.TextSize = 14
     discordButton.Font = Enum.Font.Gotham
     discordButton.BorderSizePixel = 0
     
     local discordCorner = Instance.new("UICorner")
-    discordCorner.CornerRadius = UDim.new(0, 6)
+    discordCorner.CornerRadius = UDim.new(0, 8)
     discordCorner.Parent = discordButton
+    
+    -- Info section at bottom
+    local infoFrame = Instance.new("Frame")
+    infoFrame.Name = "InfoFrame"
+    infoFrame.Parent = contentFrame
+    infoFrame.Position = UDim2.new(0, 40, 1, -60)
+    infoFrame.Size = UDim2.new(1, -80, 0, 50)
+    infoFrame.BackgroundTransparency = 1
     
     -- Bypass method label
     local bypassLabel = Instance.new("TextLabel")
     bypassLabel.Name = "BypassLabel"
-    bypassLabel.Parent = contentFrame
-    bypassLabel.Position = UDim2.new(0, 20, 1, -50)
-    bypassLabel.Size = UDim2.new(1, -40, 0, 15)
+    bypassLabel.Parent = infoFrame
+    bypassLabel.Position = UDim2.new(0, 0, 0, 0)
+    bypassLabel.Size = UDim2.new(1, 0, 0, 15)
     bypassLabel.BackgroundTransparency = 1
     bypassLabel.Text = "HTTP Bypass: Checking methods..."
-    bypassLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-    bypassLabel.TextSize = 10
+    bypassLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
+    bypassLabel.TextSize = 11
     bypassLabel.Font = Enum.Font.Gotham
     bypassLabel.TextXAlignment = Enum.TextXAlignment.Left
     
     -- HWID Label
     local hwidLabel = Instance.new("TextLabel")
     hwidLabel.Name = "HWIDLabel"
-    hwidLabel.Parent = contentFrame
-    hwidLabel.Position = UDim2.new(0, 20, 1, -30)
-    hwidLabel.Size = UDim2.new(1, -40, 0, 20)
+    hwidLabel.Parent = infoFrame
+    hwidLabel.Position = UDim2.new(0, 0, 0, 18)
+    hwidLabel.Size = UDim2.new(1, 0, 0, 15)
     hwidLabel.BackgroundTransparency = 1
     hwidLabel.Text = "HWID: " .. playerHWID
-    hwidLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+    hwidLabel.TextColor3 = Color3.fromRGB(120, 120, 140)
     hwidLabel.TextSize = 10
     hwidLabel.Font = Enum.Font.Gotham
     hwidLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- Version label
+    local versionLabel = Instance.new("TextLabel")
+    versionLabel.Name = "VersionLabel"
+    versionLabel.Parent = infoFrame
+    versionLabel.Position = UDim2.new(0, 0, 0, 35)
+    versionLabel.Size = UDim2.new(1, 0, 0, 15)
+    versionLabel.BackgroundTransparency = 1
+    versionLabel.Text = "Version " .. CONFIG.VERSION .. " • Secure Authentication"
+    versionLabel.TextColor3 = Color3.fromRGB(100, 100, 120)
+    versionLabel.TextSize = 9
+    versionLabel.Font = Enum.Font.Gotham
+    versionLabel.TextXAlignment = Enum.TextXAlignment.Left
     
     -- Check available HTTP methods
     local function checkHttpMethods()
@@ -404,30 +534,65 @@ local function createKeySystemGUI()
     
     checkHttpMethods()
     
+    -- Hover effects for buttons
+    local function addHoverEffect(button, hoverColor, normalColor)
+        button.MouseEnter:Connect(function()
+            TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+        end)
+        
+        button.MouseLeave:Connect(function()
+            TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = normalColor}):Play()
+        end)
+    end
+    
+    addHoverEffect(validateButton, Color3.fromRGB(186, 85, 211), Color3.fromRGB(138, 43, 226))
+    addHoverEffect(getKeyButton, Color3.fromRGB(60, 60, 75), Color3.fromRGB(40, 40, 55))
+    addHoverEffect(discordButton, Color3.fromRGB(108, 121, 255), Color3.fromRGB(88, 101, 242))
+    addHoverEffect(closeButton, Color3.fromRGB(255, 59, 59), Color3.fromRGB(40, 40, 50))
+    
+    -- Focus effect for input
+    keyInput.Focused:Connect(function()
+        TweenService:Create(inputBorder, TweenInfo.new(0.3), {BackgroundTransparency = 0.3}):Play()
+    end)
+    
+    keyInput.FocusLost:Connect(function(enterPressed)
+        TweenService:Create(inputBorder, TweenInfo.new(0.3), {BackgroundTransparency = 0.7}):Play()
+        
+        if enterPressed then
+            validateButton.MouseButton1Click:Fire()
+        end
+    end)
+    
     -- Event handlers
     closeButton.MouseButton1Click:Connect(function()
+        TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0.5, 0)
+        }):Play()
+        
+        wait(0.3)
         keySystemGUI:Destroy()
     end)
     
     getKeyButton.MouseButton1Click:Connect(function()
         if setclipboard then
             setclipboard(CONFIG.DISCORD_INVITE)
-            statusLabel.Text = "Discord invite copied to clipboard!"
+            statusLabel.Text = "✅ Discord invite copied to clipboard!"
             statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
         else
-            statusLabel.Text = "Discord: " .. CONFIG.DISCORD_INVITE
-            statusLabel.TextColor3 = Color3.fromRGB(102, 126, 234)
+            statusLabel.Text = "🔗 Discord: " .. CONFIG.DISCORD_INVITE
+            statusLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
         end
     end)
     
     discordButton.MouseButton1Click:Connect(function()
         if setclipboard then
             setclipboard(CONFIG.DISCORD_INVITE)
-            statusLabel.Text = "Discord invite copied to clipboard!"
+            statusLabel.Text = "✅ Discord invite copied to clipboard!"
             statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
         else
-            statusLabel.Text = "Discord: " .. CONFIG.DISCORD_INVITE
-            statusLabel.TextColor3 = Color3.fromRGB(102, 126, 234)
+            statusLabel.Text = "🔗 Discord: " .. CONFIG.DISCORD_INVITE
+            statusLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
         end
     end)
     
@@ -435,16 +600,24 @@ local function createKeySystemGUI()
         local key = keyInput.Text:gsub("%s+", "") -- Remove spaces
         
         if key == "" then
-            statusLabel.Text = "Please enter a key!"
+            statusLabel.Text = "❌ Please enter a valid key!"
             statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+            
+            -- Shake animation for empty input
+            local originalPos = inputContainer.Position
+            TweenService:Create(inputContainer, TweenInfo.new(0.1), {Position = originalPos + UDim2.new(0, 5, 0, 0)}):Play()
+            wait(0.1)
+            TweenService:Create(inputContainer, TweenInfo.new(0.1), {Position = originalPos - UDim2.new(0, 5, 0, 0)}):Play()
+            wait(0.1)
+            TweenService:Create(inputContainer, TweenInfo.new(0.1), {Position = originalPos}):Play()
             return
         end
         
         -- Show loading state
-        validateButton.Text = "Validating..."
-        validateButton.BackgroundColor3 = Color3.fromRGB(156, 163, 175)
+        validateButton.Text = "🔄 Authenticating..."
+        validateButton.BackgroundColor3 = Color3.fromRGB(100, 100, 120)
         
-        statusLabel.Text = "Validating key with bypass methods..."
+        statusLabel.Text = "🔍 Validating key with secure servers..."
         statusLabel.TextColor3 = Color3.fromRGB(251, 191, 36)
         
         -- Validate key with bypass
@@ -452,10 +625,10 @@ local function createKeySystemGUI()
             local isValid, reason, timeLeft = validateKey(key, playerHWID)
             
             if isValid then
-                statusLabel.Text = "✅ Key validated successfully!"
+                statusLabel.Text = "✅ Authentication successful! Loading script..."
                 statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
                 
-                validateButton.Text = "Success!"
+                validateButton.Text = "✅ Authenticated"
                 validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
                 
                 -- Show time left if available
@@ -464,15 +637,20 @@ local function createKeySystemGUI()
                     local hours = math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
                     
                     if days > 0 then
-                        statusLabel.Text = statusLabel.Text .. " (Expires in " .. days .. "d " .. hours .. "h)"
+                        statusLabel.Text = statusLabel.Text .. " (Valid for " .. days .. "d " .. hours .. "h)"
                     else
-                        statusLabel.Text = statusLabel.Text .. " (Expires in " .. hours .. "h)"
+                        statusLabel.Text = statusLabel.Text .. " (Valid for " .. hours .. "h)"
                     end
                 end
                 
                 isValidated = true
                 
-                -- Close GUI after 2 seconds
+                -- Success animation
+                TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+                    Size = UDim2.new(0, 0, 0, 0),
+                    Position = UDim2.new(0.5, 0, 0.5, 0)
+                }):Play()
+                
                 wait(2)
                 keySystemGUI:Destroy()
                 
@@ -480,20 +658,21 @@ local function createKeySystemGUI()
                 statusLabel.Text = "❌ " .. reason
                 statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
                 
-                validateButton.Text = "Validate Key"
-                validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
+                validateButton.Text = "Authenticate Key"
+                validateButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+                
+                -- Error shake animation
+                local originalPos = mainFrame.Position
+                TweenService:Create(mainFrame, TweenInfo.new(0.1), {Position = originalPos + UDim2.new(0, 10, 0, 0)}):Play()
+                wait(0.1)
+                TweenService:Create(mainFrame, TweenInfo.new(0.1), {Position = originalPos - UDim2.new(0, 10, 0, 0)}):Play()
+                wait(0.1)
+                TweenService:Create(mainFrame, TweenInfo.new(0.1), {Position = originalPos}):Play()
             end
         end)
     end)
     
-    -- Enter key to validate
-    keyInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            validateButton.MouseButton1Click:Fire()
-        end
-    end)
-    
-    -- Make draggable (same as before)
+    -- Make draggable
     local dragToggle = nil
     local dragSpeed = 0.25
     local dragStart = nil
@@ -527,12 +706,21 @@ local function createKeySystemGUI()
     end)
     
     -- Animate GUI entrance
-    mainFrame.Position = UDim2.new(0.5, 0, 0.5, -100)
+    mainFrame.Position = UDim2.new(0.5, 0, 0.3, 0)
     mainFrame.Size = UDim2.new(0, 0, 0, 0)
     
-    TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(0.5, 0, 0.5, 0),
-        Size = UDim2.new(0, 450, 0, 320)
+        Size = UDim2.new(0, 500, 0, 380)
+    }):Play()
+    
+    -- Animate glow and accent border
+    TweenService:Create(glowFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 520, 0, 400)
+    }):Play()
+    
+    TweenService:Create(accentBorder, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 504, 0, 384)
     }):Play()
     
     -- Parent to PlayerGui
@@ -540,6 +728,9 @@ local function createKeySystemGUI()
     
     return keySystemGUI
 end
+-- ==================================================================================
+-- GUI CODE ENDS HERE - REPLACE UNTIL THIS LINE FOR FUTURE GUI UPDATES
+-- ==================================================================================
 
 -- Main initialization function
 function PhantomKeySystem.init()
