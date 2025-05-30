@@ -177,13 +177,13 @@ local function createKeyAuthSystem()
     licenseStroke.Transparency = 0.7
     licenseStroke.Parent = LicenseBox
     
-    -- Submit Button (Futuristic neon style with glossy pink background)
+    -- Submit Button (Bright glossy neon style)
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
     SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
@@ -193,28 +193,28 @@ local function createKeyAuthSystem()
     buttonCorner.Parent = SubmitButton
     
     local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(255, 0, 255)
+    buttonStroke.Color = Color3.fromRGB(255, 100, 255)
     buttonStroke.Thickness = 2
-    buttonStroke.Transparency = 0.3
+    buttonStroke.Transparency = 0.2
     buttonStroke.Parent = SubmitButton
     
-    -- Add glossy gradient effect
+    -- Add bright glossy gradient effect
     local buttonGradient = Instance.new("UIGradient")
     buttonGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(150, 50, 150)),  -- Lighter at top
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 0, 100)), -- Original in middle
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(70, 0, 70))      -- Darker at bottom
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 255)),   -- Bright at top
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)), -- Pure magenta in middle
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 200))    -- Slightly darker at bottom
     }
     buttonGradient.Rotation = 90 -- Vertical gradient
     buttonGradient.Parent = SubmitButton
     
-    -- Add shine/highlight effect
+    -- Add bright shine/highlight effect
     local shineFrame = Instance.new("Frame")
     shineFrame.Parent = SubmitButton
-    shineFrame.Size = UDim2.new(1, 0, 0.3, 0)
+    shineFrame.Size = UDim2.new(1, 0, 0.4, 0)
     shineFrame.Position = UDim2.new(0, 0, 0, 0)
     shineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    shineFrame.BackgroundTransparency = 0.8
+    shineFrame.BackgroundTransparency = 0.5
     shineFrame.BorderSizePixel = 0
     shineFrame.ZIndex = SubmitButton.ZIndex + 1
     
@@ -228,7 +228,7 @@ local function createKeyAuthSystem()
         ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
     }
     shineGradient.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.6),  -- More visible at top
+        NumberSequenceKeypoint.new(0, 0.3),  -- Visible bright shine at top
         NumberSequenceKeypoint.new(1, 1)     -- Fade to invisible
     }
     shineGradient.Rotation = 90
@@ -237,13 +237,14 @@ local function createKeyAuthSystem()
     -- Hover effect for button
     SubmitButton.MouseEnter:Connect(function()
         buttonGradient.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 80, 200)),  -- Brighter at top
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 150)), -- Brighter in middle
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 0, 120))    -- Brighter at bottom
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 150, 255)),  -- Even brighter at top
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 50, 255)), -- Bright in middle
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))     -- Bright at bottom
         }
         buttonStroke.Thickness = 3
+        buttonStroke.Color = Color3.fromRGB(255, 255, 255)
         shineGradient.Transparency = NumberSequence.new{
-            NumberSequenceKeypoint.new(0, 0.4),  -- More shine on hover
+            NumberSequenceKeypoint.new(0, 0.1),  -- More intense shine on hover
             NumberSequenceKeypoint.new(1, 1)
         }
     end)
@@ -251,13 +252,14 @@ local function createKeyAuthSystem()
     SubmitButton.MouseLeave:Connect(function()
         if SubmitButton.Text == "Activate License" then
             buttonGradient.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(150, 50, 150)),
-                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 0, 100)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(70, 0, 70))
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 255)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 200))
             }
             buttonStroke.Thickness = 2
+            buttonStroke.Color = Color3.fromRGB(255, 100, 255)
             shineGradient.Transparency = NumberSequence.new{
-                NumberSequenceKeypoint.new(0, 0.6),
+                NumberSequenceKeypoint.new(0, 0.3),
                 NumberSequenceKeypoint.new(1, 1)
             }
         end
