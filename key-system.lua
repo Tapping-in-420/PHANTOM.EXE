@@ -8,7 +8,7 @@ local CONFIG = {
     API_URL = "https://2d7e5e66-d814-4c12-9524-99dc13ca819e-00-1hy2gw53vhuk4.picard.replit.dev", -- Replace with your Replit URL
     APP_NAME = "Phantom Executor",
     VERSION = "1.0",
-    DISCORD_INVITE = "https://discord.gg/yourserver" -- Optional
+    DISCORD_INVITE = "https://discord.gg/DZcZXe8TNa" -- Your actual Discord invite 
 }
 
 -- Services
