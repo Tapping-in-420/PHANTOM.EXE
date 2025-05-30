@@ -1,336 +1,445 @@
--- KeyAuth.cc License-Only System for Phantom.exe
-print("🚀 Starting Phantom.exe KeyAuth License System...")
+-- Phantom Key System for Roblox
+-- Replace your Keyauth system with this
 
-local function createKeyAuthSystem()
-    local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
-    
-    -- KeyAuth Configuration (API 1.3)
-    local KEYAUTH_CONFIG = {
-        name = "PHANTOM.EXE",        -- Your KeyAuth app name
-        ownerid = "a3htS88XUH",      -- Your KeyAuth owner ID
-        version = "1.0"              -- Your app version
-    }
-    
-    local function initializeKeyAuth()
-        local url = "https://keyauth.win/api/1.3/"
-        local params = "?type=init&name=" .. KEYAUTH_CONFIG.name .. 
-                      "&ownerid=" .. KEYAUTH_CONFIG.ownerid .. 
-                      "&version=" .. KEYAUTH_CONFIG.version
-        
-        print("🔍 Initializing KeyAuth API 1.3...")
-        print("📡 Init URL:", url .. params)
-        
-        local success, response = pcall(function()
-            return game:HttpGet(url .. params)
-        end)
-        
-        if success then
-            print("📥 Init response:", response)
-            local parseSuccess, data = pcall(function()
-                return game:GetService("HttpService"):JSONDecode(response)
-            end)
-            
-            if parseSuccess and data.success then
-                print("✅ KeyAuth initialized successfully")
-                return data.sessionid, data.message
-            else
-                print("❌ KeyAuth init failed:", data.message or "Unknown error")
-                return false, data.message or "Initialization failed"
-            end
-        else
-            print("❌ Network error during KeyAuth init:", response)
-            return false, "Network error"
-        end
+local PhantomKeySystem = {}
+
+-- Configuration
+local CONFIG = {
+    API_URL = "https://yourproject.repl.co", -- Replace with your Replit URL
+    APP_NAME = "Phantom Executor",
+    VERSION = "1.0",
+    DISCORD_INVITE = "https://discord.gg/yourserver" -- Optional
+}
+
+-- Services
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Variables
+local LocalPlayer = Players.LocalPlayer
+local playerHWID = nil
+local isValidated = false
+local keySystemGUI = nil
+
+-- HWID Generation (unique per user)
+local function generateHWID()
+    local hwid = LocalPlayer.UserId .. "_" .. game.JobId:sub(1, 8)
+    -- Add more unique identifiers for better security
+    if game.PlaceId then
+        hwid = hwid .. "_" .. tostring(game.PlaceId):sub(1, 6)
     end
-    
-    local function validateLicense(license, sessionid)
-        local url = "https://keyauth.win/api/1.3/"
-        local params = "?type=license&key=" .. license .. 
-                      "&sessionid=" .. sessionid .. 
-                      "&name=" .. KEYAUTH_CONFIG.name .. 
-                      "&ownerid=" .. KEYAUTH_CONFIG.ownerid .. 
-                      "&hwid=" .. hwid
-        
-        print("🔍 Validating license:", license)
-        print("📡 License URL:", url .. params)
-        
-        local success, response = pcall(function()
-            return game:HttpGet(url .. params)
-        end)
-        
-        if success then
-            print("📥 License response:", response)
-            local parseSuccess, data = pcall(function()
-                return game:GetService("HttpService"):JSONDecode(response)
-            end)
-            
-            if parseSuccess then
-                if data.success then
-                    return true, "License activated successfully! Welcome to Phantom.exe"
-                else
-                    return false, data.message or "License validation failed"
-                end
-            else
-                return false, "Invalid response format"
-            end
-        else
-            print("❌ Network error during license validation:", response)
-            return false, "Network error"
-        end
-    end
-    
-    -- Create GUI
-    local ScreenGui = Instance.new("ScreenGui")
-    local Frame = Instance.new("Frame")
-    local LicenseBox = Instance.new("TextBox")
-    local SubmitButton = Instance.new("TextButton")
-    local Title = Instance.new("TextLabel")
-    local StatusLabel = Instance.new("TextLabel")
-    local HWIDLabel = Instance.new("TextLabel")
-    local InfoLabel = Instance.new("TextLabel")
-    
-    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-    ScreenGui.Name = "PhantomKeyAuthLicense"
-    ScreenGui.ResetOnSpawn = false
-    
-    -- Main Frame (Futuristic style without complex animations)
-    Frame.Parent = ScreenGui
-    Frame.Size = UDim2.new(0, 420, 0, 340)
-    Frame.Position = UDim2.new(0.5, -210, 0.5, -170)
-    Frame.BackgroundColor3 = Color3.fromRGB(8, 12, 30)
-    Frame.BorderSizePixel = 3
-    Frame.BorderColor3 = Color3.fromRGB(0, 255, 255)
-    Frame.Active = true
-    Frame.Draggable = true
-    
-    -- Add corner radius
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 20)
-    corner.Parent = Frame
-    
-    -- Neon glow stroke
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(255, 0, 255)
-    stroke.Thickness = 2
-    stroke.Transparency = 0.3
-    stroke.Parent = Frame
-    
-    -- Title (Neon styled)
-    Title.Parent = Frame
-    Title.Size = UDim2.new(1, 0, 0, 60)
-    Title.Position = UDim2.new(0, 0, 0, 15)
-    Title.Text = "PHANTOM.EXE LICENSE"
-    Title.TextColor3 = Color3.fromRGB(0, 255, 255)
-    Title.BackgroundTransparency = 1
-    Title.TextSize = 22
-    Title.Font = Enum.Font.GothamBold
-    
-    -- Add text stroke for neon glow
-    local titleStroke = Instance.new("UIStroke")
-    titleStroke.Color = Color3.fromRGB(255, 0, 255)
-    titleStroke.Thickness = 1
-    titleStroke.Transparency = 0.5
-    titleStroke.Parent = Title
-    
-    -- Info Label (Neon styled)
-    InfoLabel.Parent = Frame
-    InfoLabel.Size = UDim2.new(0.9, 0, 0, 30)
-    InfoLabel.Position = UDim2.new(0.05, 0, 0.22, 0)
-    InfoLabel.Text = "▸ Enter your premium license key to access Phantom.exe"
-    InfoLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
-    InfoLabel.BackgroundTransparency = 1
-    InfoLabel.TextSize = 12
-    InfoLabel.Font = Enum.Font.Gotham
-    InfoLabel.TextWrapped = true
-    
-    -- HWID Display (Futuristic style)
-    HWIDLabel.Parent = Frame
-    HWIDLabel.Size = UDim2.new(0.9, 0, 0, 25)
-    HWIDLabel.Position = UDim2.new(0.05, 0, 0.32, 0)
-    HWIDLabel.Text = "▸ HWID: " .. hwid:sub(1, 32) .. "..."
-    HWIDLabel.TextColor3 = Color3.fromRGB(150, 150, 200)
-    HWIDLabel.BackgroundTransparency = 1
-    HWIDLabel.TextSize = 9
-    HWIDLabel.Font = Enum.Font.Gotham
-    
-    -- License Input (Neon styled)
-    LicenseBox.Parent = Frame
-    LicenseBox.Size = UDim2.new(0.85, 0, 0, 45)
-    LicenseBox.Position = UDim2.new(0.075, 0, 0.45, 0)
-    LicenseBox.PlaceholderText = "Enter your license key here..."
-    LicenseBox.Text = ""
-    LicenseBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    LicenseBox.BackgroundColor3 = Color3.fromRGB(10, 15, 35)
-    LicenseBox.BorderSizePixel = 2
-    LicenseBox.BorderColor3 = Color3.fromRGB(0, 150, 255)
-    LicenseBox.TextSize = 14
-    LicenseBox.Font = Enum.Font.Gotham
-    LicenseBox.ClearTextOnFocus = false
-    
-    local licenseCorner = Instance.new("UICorner")
-    licenseCorner.CornerRadius = UDim.new(0, 12)
-    licenseCorner.Parent = LicenseBox
-    
-    local licenseStroke = Instance.new("UIStroke")
-    licenseStroke.Color = Color3.fromRGB(255, 0, 255)
-    licenseStroke.Thickness = 1
-    licenseStroke.Transparency = 0.7
-    licenseStroke.Parent = LicenseBox
-    
-    -- Submit Button (Simple style like the text box)
-    SubmitButton.Parent = Frame
-    SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
-    SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
-    SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white text (no stroke for subtle look)
-    SubmitButton.BackgroundColor3 = Color3.fromRGB(10, 15, 35) -- Same as text box
-    SubmitButton.BorderSizePixel = 2
-    SubmitButton.BorderColor3 = Color3.fromRGB(0, 150, 255) -- Same as text box
-    SubmitButton.TextSize = 16
-    SubmitButton.Font = Enum.Font.GothamBold
-    
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 12)
-    buttonCorner.Parent = SubmitButton
-    
-    local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(255, 0, 255)
-    buttonStroke.Thickness = 1
-    buttonStroke.Transparency = 0.7
-    buttonStroke.Parent = SubmitButton
-    
-    -- Simple hover effect for button
-    
-    -- Hover effect for button
-    SubmitButton.MouseEnter:Connect(function()
-        buttonGradient.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 150, 255)),  -- Even brighter at top
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 50, 255)), -- Bright in middle
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))     -- Bright at bottom
-        }
-        buttonStroke.Thickness = 3
-        buttonStroke.Color = Color3.fromRGB(255, 255, 255)
-        buttonTextStroke.Thickness = 3 -- Increase white glow on hover
-        buttonTextStroke.Transparency = 0.1 -- Make glow more intense
-        shineGradient.Transparency = NumberSequence.new{
-            NumberSequenceKeypoint.new(0, 0.1),  -- More intense shine on hover
-            NumberSequenceKeypoint.new(1, 1)
-        }
-    end)
-    
-    SubmitButton.MouseLeave:Connect(function()
-        if SubmitButton.Text == "Activate License" then
-            buttonGradient.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 255)),
-                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 200))
-            }
-            buttonStroke.Thickness = 2
-            buttonStroke.Color = Color3.fromRGB(255, 100, 255)
-            buttonTextStroke.Thickness = 2 -- Reset white glow
-            buttonTextStroke.Transparency = 0.3 -- Reset glow intensity
-            shineGradient.Transparency = NumberSequence.new{
-                NumberSequenceKeypoint.new(0, 0.3),
-                NumberSequenceKeypoint.new(1, 1)
-            }
-        end
-    end)
-    
-    -- Status Label (Neon styled)
-    StatusLabel.Parent = Frame
-    StatusLabel.Size = UDim2.new(0.9, 0, 0, 60)
-    StatusLabel.Position = UDim2.new(0.05, 0, 0.75, 0)
-    StatusLabel.Text = "Connecting to KeyAuth servers..."
-    StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-    StatusLabel.BackgroundTransparency = 1
-    StatusLabel.TextSize = 11
-    StatusLabel.Font = Enum.Font.Gotham
-    StatusLabel.TextWrapped = true
-    
-    -- Initialize KeyAuth on startup
-    local sessionid, initMessage = initializeKeyAuth()
-    
-    if sessionid then
-        StatusLabel.Text = "Connected to KeyAuth! Ready to validate your license."
-        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
-    else
-        StatusLabel.Text = "Failed to connect to KeyAuth: " .. (initMessage or "Unknown error")
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        SubmitButton.Text = "Connection Failed"
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 50)
-        LicenseBox.PlaceholderText = "KeyAuth connection failed..."
-        return
-    end
-    
-    -- Submit Button Logic
-    SubmitButton.MouseButton1Click:Connect(function()
-        local license = LicenseBox.Text:gsub("%s+", "") -- Remove spaces
-        
-        if license == "" then
-            StatusLabel.Text = "Please enter your license key!"
-            StatusLabel.TextColor3 = Color3.fromRGB(255, 150, 100)
-            
-            -- Shake animation for empty input
-            local originalPos = LicenseBox.Position
-            for i = 1, 3 do
-                LicenseBox.Position = originalPos + UDim2.new(0, 5, 0, 0)
-                wait(0.05)
-                LicenseBox.Position = originalPos + UDim2.new(0, -5, 0, 0)
-                wait(0.05)
-            end
-            LicenseBox.Position = originalPos
-            return
-        end
-        
-        if not sessionid then
-            StatusLabel.Text = "KeyAuth not properly initialized!"
-            StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            return
-        end
-        
-        -- Update UI for validation
-        StatusLabel.Text = "Validating license with KeyAuth servers..."
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-        SubmitButton.Text = "Validating..."
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 50, 0)
-        LicenseBox.TextEditable = false
-        
-        wait(0.8) -- Realistic delay
-        
-        local success, message = validateLicense(license, sessionid)
-        
-        if success then
-            StatusLabel.Text = message
-            StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
-            SubmitButton.Text = "Loading Phantom.exe..."
-            SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 100)
-            
-            wait(2)
-            ScreenGui:Destroy()
-            
-            print("🎉 KeyAuth license validation successful! Loading Phantom.exe...")
-            loadstring(game:HttpGet('https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/refs/heads/main/PHANTOM.EXE'))()
-        else
-            StatusLabel.Text = "License validation failed: " .. message
-            StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            SubmitButton.Text = "Activate License"
-            SubmitButton.BackgroundColor3 = Color3.fromRGB(50, 0, 100)
-            LicenseBox.TextEditable = true
-            LicenseBox.Text = ""
-        end
-    end)
-    
-    -- Enter key support
-    LicenseBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed and LicenseBox.Text ~= "" then
-            SubmitButton.MouseButton1Click:Fire()
-        end
-    end)
-    
-    print("✅ KeyAuth License-Only system loaded successfully")
-    print("📋 App Name:", KEYAUTH_CONFIG.name)
-    print("👤 Owner ID:", KEYAUTH_CONFIG.ownerid)
-    print("🔑 Session ID:", sessionid or "Failed to initialize")
+    return hwid
 end
 
-createKeyAuthSystem()
+-- HTTP Request function with error handling
+local function makeRequest(endpoint, method, data)
+    method = method or "GET"
+    
+    local success, response = pcall(function()
+        if method == "GET" then
+            return HttpService:GetAsync(CONFIG.API_URL .. endpoint)
+        elseif method == "POST" then
+            return HttpService:PostAsync(
+                CONFIG.API_URL .. endpoint,
+                HttpService:JSONEncode(data or {}),
+                Enum.HttpContentType.ApplicationJson
+            )
+        end
+    end)
+    
+    if success then
+        local jsonSuccess, jsonData = pcall(function()
+            return HttpService:JSONDecode(response)
+        end)
+        
+        if jsonSuccess then
+            return true, jsonData
+        else
+            return false, "Invalid JSON response"
+        end
+    else
+        return false, response
+    end
+end
+
+-- Key validation function
+local function validateKey(key, hwid)
+    local endpoint = "/api/validate/" .. key .. "/" .. hwid
+    local success, response = makeRequest(endpoint)
+    
+    if success then
+        return response.valid, response.reason, response.timeLeft
+    else
+        return false, "Connection error: " .. tostring(response), 0
+    end
+end
+
+-- Create modern GUI
+local function createKeySystemGUI()
+    -- Destroy existing GUI if it exists
+    if keySystemGUI then
+        keySystemGUI:Destroy()
+    end
+    
+    -- Create ScreenGui
+    keySystemGUI = Instance.new("ScreenGui")
+    keySystemGUI.Name = "PhantomKeySystem"
+    keySystemGUI.ResetOnSpawn = false
+    keySystemGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    -- Main Frame
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainFrame"
+    mainFrame.Parent = keySystemGUI
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    mainFrame.Size = UDim2.new(0, 450, 0, 320)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    mainFrame.BorderSizePixel = 0
+    
+    -- Rounded corners
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = mainFrame
+    
+    -- Drop shadow effect
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Parent = keySystemGUI
+    shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+    shadow.Position = UDim2.new(0.5, 0, 0.5, 5)
+    shadow.Size = UDim2.new(0, 460, 0, 330)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.7
+    shadow.ZIndex = mainFrame.ZIndex - 1
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(0, 12)
+    shadowCorner.Parent = shadow
+    
+    -- Header
+    local headerFrame = Instance.new("Frame")
+    headerFrame.Name = "Header"
+    headerFrame.Parent = mainFrame
+    headerFrame.Size = UDim2.new(1, 0, 0, 60)
+    headerFrame.BackgroundColor3 = Color3.fromRGB(102, 126, 234)
+    headerFrame.BorderSizePixel = 0
+    
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 12)
+    headerCorner.Parent = headerFrame
+    
+    -- Fix header corners (bottom should be square)
+    local headerBottomFix = Instance.new("Frame")
+    headerBottomFix.Parent = headerFrame
+    headerBottomFix.Position = UDim2.new(0, 0, 0.7, 0)
+    headerBottomFix.Size = UDim2.new(1, 0, 0.3, 0)
+    headerBottomFix.BackgroundColor3 = Color3.fromRGB(102, 126, 234)
+    headerBottomFix.BorderSizePixel = 0
+    
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "Title"
+    titleLabel.Parent = headerFrame
+    titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    titleLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    titleLabel.Size = UDim2.new(0.8, 0, 0.8, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "🔑 " .. CONFIG.APP_NAME .. " Key System"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextScaled = true
+    titleLabel.Font = Enum.Font.GothamBold
+    
+    -- Close button
+    local closeButton = Instance.new("TextButton")
+    closeButton.Name = "CloseButton"
+    closeButton.Parent = headerFrame
+    closeButton.AnchorPoint = Vector2.new(1, 0)
+    closeButton.Position = UDim2.new(1, -10, 0, 10)
+    closeButton.Size = UDim2.new(0, 40, 0, 40)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 59, 59)
+    closeButton.Text = "✕"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.TextScaled = true
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.BorderSizePixel = 0
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = closeButton
+    
+    -- Content Frame
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Name = "Content"
+    contentFrame.Parent = mainFrame
+    contentFrame.Position = UDim2.new(0, 0, 0, 60)
+    contentFrame.Size = UDim2.new(1, 0, 1, -60)
+    contentFrame.BackgroundTransparency = 1
+    
+    -- Status label
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Name = "StatusLabel"
+    statusLabel.Parent = contentFrame
+    statusLabel.Position = UDim2.new(0, 20, 0, 20)
+    statusLabel.Size = UDim2.new(1, -40, 0, 30)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Text = "Enter your key to continue:"
+    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    statusLabel.TextSize = 16
+    statusLabel.Font = Enum.Font.Gotham
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- Key input
+    local keyInput = Instance.new("TextBox")
+    keyInput.Name = "KeyInput"
+    keyInput.Parent = contentFrame
+    keyInput.Position = UDim2.new(0, 20, 0, 60)
+    keyInput.Size = UDim2.new(1, -40, 0, 40)
+    keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    keyInput.BorderSizePixel = 0
+    keyInput.Text = ""
+    keyInput.PlaceholderText = "Enter your key here (e.g., ABCD-1234-EFGH-5678)"
+    keyInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+    keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyInput.TextSize = 14
+    keyInput.Font = Enum.Font.Gotham
+    keyInput.ClearTextOnFocus = false
+    
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 6)
+    inputCorner.Parent = keyInput
+    
+    -- Validate button
+    local validateButton = Instance.new("TextButton")
+    validateButton.Name = "ValidateButton"
+    validateButton.Parent = contentFrame
+    validateButton.Position = UDim2.new(0, 20, 0, 120)
+    validateButton.Size = UDim2.new(1, -40, 0, 40)
+    validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
+    validateButton.Text = "Validate Key"
+    validateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    validateButton.TextSize = 16
+    validateButton.Font = Enum.Font.GothamBold
+    validateButton.BorderSizePixel = 0
+    
+    local validateCorner = Instance.new("UICorner")
+    validateCorner.CornerRadius = UDim.new(0, 6)
+    validateCorner.Parent = validateButton
+    
+    -- Get key button
+    local getKeyButton = Instance.new("TextButton")
+    getKeyButton.Name = "GetKeyButton"
+    getKeyButton.Parent = contentFrame
+    getKeyButton.Position = UDim2.new(0, 20, 0, 170)
+    getKeyButton.Size = UDim2.new(0.48, -10, 0, 35)
+    getKeyButton.BackgroundColor3 = Color3.fromRGB(102, 126, 234)
+    getKeyButton.Text = "Get Key"
+    getKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    getKeyButton.TextSize = 14
+    getKeyButton.Font = Enum.Font.Gotham
+    getKeyButton.BorderSizePixel = 0
+    
+    local getKeyCorner = Instance.new("UICorner")
+    getKeyCorner.CornerRadius = UDim.new(0, 6)
+    getKeyCorner.Parent = getKeyButton
+    
+    -- Discord button
+    local discordButton = Instance.new("TextButton")
+    discordButton.Name = "DiscordButton"
+    discordButton.Parent = contentFrame
+    discordButton.Position = UDim2.new(0.52, 10, 0, 170)
+    discordButton.Size = UDim2.new(0.48, -10, 0, 35)
+    discordButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+    discordButton.Text = "Discord"
+    discordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    discordButton.TextSize = 14
+    discordButton.Font = Enum.Font.Gotham
+    discordButton.BorderSizePixel = 0
+    
+    local discordCorner = Instance.new("UICorner")
+    discordCorner.CornerRadius = UDim.new(0, 6)
+    discordCorner.Parent = discordButton
+    
+    -- HWID Label
+    local hwidLabel = Instance.new("TextLabel")
+    hwidLabel.Name = "HWIDLabel"
+    hwidLabel.Parent = contentFrame
+    hwidLabel.Position = UDim2.new(0, 20, 1, -30)
+    hwidLabel.Size = UDim2.new(1, -40, 0, 20)
+    hwidLabel.BackgroundTransparency = 1
+    hwidLabel.Text = "HWID: " .. playerHWID
+    hwidLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+    hwidLabel.TextSize = 10
+    hwidLabel.Font = Enum.Font.Gotham
+    hwidLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- Event handlers
+    closeButton.MouseButton1Click:Connect(function()
+        keySystemGUI:Destroy()
+    end)
+    
+    getKeyButton.MouseButton1Click:Connect(function()
+        setclipboard(CONFIG.DISCORD_INVITE)
+        statusLabel.Text = "Discord invite copied to clipboard!"
+        statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+    end)
+    
+    discordButton.MouseButton1Click:Connect(function()
+        setclipboard(CONFIG.DISCORD_INVITE)
+        statusLabel.Text = "Discord invite copied to clipboard!"
+        statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+    end)
+    
+    validateButton.MouseButton1Click:Connect(function()
+        local key = keyInput.Text:gsub("%s+", "") -- Remove spaces
+        
+        if key == "" then
+            statusLabel.Text = "Please enter a key!"
+            statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+            return
+        end
+        
+        -- Show loading state
+        validateButton.Text = "Validating..."
+        validateButton.BackgroundColor3 = Color3.fromRGB(156, 163, 175)
+        
+        statusLabel.Text = "Validating key..."
+        statusLabel.TextColor3 = Color3.fromRGB(251, 191, 36)
+        
+        -- Validate key
+        local isValid, reason, timeLeft = validateKey(key, playerHWID)
+        
+        if isValid then
+            statusLabel.Text = "✅ Key validated successfully!"
+            statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+            
+            validateButton.Text = "Success!"
+            validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
+            
+            -- Show time left if available
+            if timeLeft and timeLeft > 0 then
+                local days = math.floor(timeLeft / (24 * 60 * 60 * 1000))
+                local hours = math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
+                
+                if days > 0 then
+                    statusLabel.Text = statusLabel.Text .. " (Expires in " .. days .. "d " .. hours .. "h)"
+                else
+                    statusLabel.Text = statusLabel.Text .. " (Expires in " .. hours .. "h)"
+                end
+            end
+            
+            isValidated = true
+            
+            -- Close GUI after 2 seconds
+            wait(2)
+            keySystemGUI:Destroy()
+            
+        else
+            statusLabel.Text = "❌ " .. reason
+            statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+            
+            validateButton.Text = "Validate Key"
+            validateButton.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
+        end
+    end)
+    
+    -- Enter key to validate
+    keyInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            validateButton.MouseButton1Click:Fire()
+        end
+    end)
+    
+    -- Make draggable
+    local dragToggle = nil
+    local dragSpeed = 0.25
+    local dragStart = nil
+    local startPos = nil
+    
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        local position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        TweenService:Create(mainFrame, TweenInfo.new(dragSpeed), {Position = position}):Play()
+    end
+    
+    headerFrame.InputBegan:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            dragToggle = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragToggle = false
+                end
+            end)
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            if dragToggle then
+                updateInput(input)
+            end
+        end
+    end)
+    
+    -- Animate GUI entrance
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, -100)
+    mainFrame.Size = UDim2.new(0, 0, 0, 0)
+    
+    TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        Size = UDim2.new(0, 450, 0, 320)
+    }):Play()
+    
+    -- Parent to PlayerGui
+    keySystemGUI.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    
+    return keySystemGUI
+end
+
+-- Main initialization function
+function PhantomKeySystem.init()
+    -- Generate HWID
+    playerHWID = generateHWID()
+    
+    print("🔑 Phantom Key System Initialized")
+    print("HWID: " .. playerHWID)
+    
+    -- Check if already validated (optional: save to file)
+    -- For now, always show key system
+    
+    -- Create and show GUI
+    createKeySystemGUI()
+    
+    -- Wait for validation
+    local attempts = 0
+    local maxAttempts = 300 -- 5 minutes timeout
+    
+    while not isValidated and attempts < maxAttempts do
+        wait(1)
+        attempts = attempts + 1
+    end
+    
+    if isValidated then
+        print("✅ Key validation successful!")
+        return true
+    else
+        print("❌ Key validation timeout")
+        return false
+    end
+end
+
+-- Function to check if user is validated
+function PhantomKeySystem.isValidated()
+    return isValidated
+end
+
+-- Function to get player HWID
+function PhantomKeySystem.getHWID()
+    return playerHWID
+end
+
+return PhantomKeySystem
