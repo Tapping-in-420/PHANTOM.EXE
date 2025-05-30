@@ -1,13 +1,12 @@
--- Debug Auth.gg Key System for Phantom.exe
+-- Fixed Auth.gg Key System for Phantom.exe
 local function createKeySystem()
     local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
     local APP_ID = "34033"
     
     local function checkKey(key)
-        local url = "https://developers.auth.gg/HWID/?type=key&authorization=" .. key .. "&app=" .. APP_ID
+        -- Updated API endpoint format
+        local url = "https://developers.auth.gg/HWID/?type=key&authorization=" .. key .. "&app=" .. APP_ID .. "&hwid=" .. hwid
         print("🔍 Debug - Checking URL:", url)
-        print("🔍 Debug - App ID:", APP_ID)
-        print("🔍 Debug - Key entered:", key)
         
         local success, response = pcall(function()
             return game:HttpGet(url)
@@ -22,7 +21,8 @@ local function createKeySystem()
             if parseSuccess then
                 print("🔍 Debug - Parsed data:", data)
                 print("🔍 Debug - Status:", data.status)
-                return data.status == "success"
+                -- Check for both "success" and "key_valid" responses
+                return data.status == "success" or data.status == "key_valid"
             else
                 print("🔍 Debug - JSON parse failed:", data)
             end
@@ -48,10 +48,10 @@ local function createKeySystem()
     
     Title.Parent = Frame
     Title.Size = UDim2.new(1, 0, 0.3, 0)
-    Title.Text = "Phantom.exe Key System (Debug)"
+    Title.Text = "Phantom.exe Key System"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.BackgroundTransparency = 1
-    Title.TextSize = 16
+    Title.TextSize = 18
     
     TextBox.Parent = Frame
     TextBox.Size = UDim2.new(0.8, 0, 0.25, 0)
@@ -63,7 +63,7 @@ local function createKeySystem()
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.8, 0, 0.25, 0)
     SubmitButton.Position = UDim2.new(0.1, 0, 0.7, 0)
-    SubmitButton.Text = "Submit Key (Check Console)"
+    SubmitButton.Text = "Submit Key"
     SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
     SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     
@@ -78,7 +78,7 @@ local function createKeySystem()
         else
             print("❌ Key validation failed!")
             TextBox.Text = ""
-            TextBox.PlaceholderText = "Invalid key! Check console for details"
+            TextBox.PlaceholderText = "Invalid key! Try again..."
         end
     end)
     
