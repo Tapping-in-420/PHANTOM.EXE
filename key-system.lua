@@ -199,6 +199,8 @@ local function createKeyAuthSystem()
     buttonStroke.Transparency = 0.7
     buttonStroke.Parent = SubmitButton
     
+    -- Simple hover effect for button
+    
     -- Hover effect for button
     SubmitButton.MouseEnter:Connect(function()
         buttonGradient.Color = ColorSequence.new{
