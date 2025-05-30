@@ -182,7 +182,7 @@ local function createKeyAuthSystem()
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white text
+    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white text (no stroke for subtle look)
     SubmitButton.BackgroundColor3 = Color3.fromRGB(10, 15, 35) -- Same as text box
     SubmitButton.BorderSizePixel = 2
     SubmitButton.BorderColor3 = Color3.fromRGB(0, 150, 255) -- Same as text box
@@ -198,6 +198,8 @@ local function createKeyAuthSystem()
     buttonStroke.Thickness = 1
     buttonStroke.Transparency = 0.7
     buttonStroke.Parent = SubmitButton
+    
+    -- Simple hover effect for button
     
     -- Hover effect for button
     SubmitButton.MouseEnter:Connect(function()
