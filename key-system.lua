@@ -174,6 +174,10 @@ end
 -- ==================================================================================
 -- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
 -- ==================================================================================
+-- Updated GUI with Centered Header (Replace the GUI section in your key-system.lua)
+-- ==================================================================================
+-- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
+-- ==================================================================================
 local function createKeySystemGUI()
     -- Destroy existing GUI if it exists
     if keySystemGUI then
@@ -282,12 +286,12 @@ local function createKeySystemGUI()
     logoText.TextScaled = true
     logoText.Font = Enum.Font.GothamBold
     
-    -- Title (centered)
+    -- Title (centered, moved down)
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Parent = headerFrame
     titleLabel.AnchorPoint = Vector2.new(0.5, 0)
-    titleLabel.Position = UDim2.new(0.5, 0, 0, 35)
+    titleLabel.Position = UDim2.new(0.5, 0, 0, 50)
     titleLabel.Size = UDim2.new(0, 400, 0, 25)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = "Phantom.exe"
@@ -296,12 +300,12 @@ local function createKeySystemGUI()
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Center
     
-    -- Subtitle (centered)
+    -- Subtitle (centered, moved down)
     local subtitleLabel = Instance.new("TextLabel")
     subtitleLabel.Name = "Subtitle"
     subtitleLabel.Parent = headerFrame
     subtitleLabel.AnchorPoint = Vector2.new(0.5, 0)
-    subtitleLabel.Position = UDim2.new(0.5, 0, 0, 60)
+    subtitleLabel.Position = UDim2.new(0.5, 0, 0, 75)
     subtitleLabel.Size = UDim2.new(0, 400, 0, 15)
     subtitleLabel.BackgroundTransparency = 1
     subtitleLabel.Text = "Advanced Key Authentication System"
@@ -310,23 +314,19 @@ local function createKeySystemGUI()
     subtitleLabel.Font = Enum.Font.Gotham
     subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     
-    -- Close button (top right)
+    -- Close button (top right, transparent background)
     local closeButton = Instance.new("TextButton")
     closeButton.Name = "CloseButton"
     closeButton.Parent = headerFrame
     closeButton.AnchorPoint = Vector2.new(1, 0)
     closeButton.Position = UDim2.new(1, -15, 0, 15)
-    closeButton.Size = UDim2.new(0, 35, 0, 35)
-    closeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.BackgroundTransparency = 1
     closeButton.Text = "✕"
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.TextSize = 16
+    closeButton.TextSize = 18
     closeButton.Font = Enum.Font.GothamBold
     closeButton.BorderSizePixel = 0
-    
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 8)
-    closeCorner.Parent = closeButton
     
     -- Content Frame
     local contentFrame = Instance.new("Frame")
@@ -722,6 +722,9 @@ local function createKeySystemGUI()
     
     return keySystemGUI
 end
+-- ==================================================================================
+-- GUI CODE ENDS HERE - REPLACE UNTIL THIS LINE FOR FUTURE GUI UPDATES
+-- ==================================================================================
 -- ==================================================================================
 -- GUI CODE ENDS HERE - REPLACE UNTIL THIS LINE FOR FUTURE GUI UPDATES
 -- ==================================================================================
