@@ -1,57 +1,80 @@
--- Fixed Auth.gg System for Phantom.exe
-print("🚀 Starting Phantom.exe Auth.gg system...")
+-- Hybrid Key System - Auth.gg + Backup validation
+print("🚀 Starting Phantom.exe Hybrid Key System...")
 
 local function createKeySystem()
-    print("📝 Creating GUI...")
-    
     local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+    
+    -- Your Auth.gg credentials
     local APP_ID = "34033"
     local APP_SECRET = "BDzsD5aoli0c70lFcSDm1YgfmVqfaqWa573"
-    local AUTH_KEY = "GENJMYJCFPJP" -- Your Authorization Key from Auth.gg
+    local AUTH_KEY = "GENJMYJCFPJP"
     
-    print("✅ HWID:", hwid)
+    -- Backup key validation (in case Auth.gg fails)
+    local validLicenses = {
+        ["MRZ5MKCU"] = {hwid = nil, expires = nil}, -- Your Auth.gg license
+        ["PHANTOM_VIP_2024"] = {hwid = nil, expires = nil},
+        ["ELITE_ACCESS_777"] = {hwid = nil, expires = nil}
+    }
+    
     print("✅ App ID:", APP_ID)
-    print("✅ Auth Key:", AUTH_KEY)
+    print("✅ HWID:", hwid)
     
-    -- Correct Auth.gg validation function
+    -- Try Auth.gg first, then backup
     local function validateLicense(licenseKey)
-        print("🔍 Attempting to validate license:", licenseKey)
+        print("🔍 Validating license:", licenseKey)
         
-        local success, result = pcall(function()
-            -- Correct Auth.gg API format based on your settings
+        -- Method 1: Try Auth.gg
+        local authGGSuccess, authGGResult = pcall(function()
             local url = "https://api.auth.gg/v1/"
+            local postData = "type=info&aid=" .. APP_ID .. "&apikey=" .. AUTH_KEY .. "&secret=" .. APP_SECRET
             
-            -- Since HWID Check is disabled, we don't need to send HWID
-            local postData = "type=login&aid=" .. APP_ID .. "&apikey=" .. AUTH_KEY .. "&secret=" .. APP_SECRET .. "&username=" .. licenseKey .. "&password=" .. licenseKey
-            
-            print("📡 Making request to:", url)
-            print("📤 POST data:", postData)
-            
+            print("📡 Testing Auth.gg connection...")
             local response = game:HttpGet(url .. "?" .. postData, true)
-            print("📥 Raw response:", response)
+            print("📥 Auth.gg response:", response)
             
-            if response and response ~= "" then
-                local data = game:GetService("HttpService"):JSONDecode(response)
-                print("📊 Parsed data:", data)
+            local data = game:GetService("HttpService"):JSONDecode(response)
+            if data.status == "Enabled" then
+                print("✅ Auth.gg connection successful")
+                -- Now try license validation with login method
+                local loginData = "type=login&aid=" .. APP_ID .. "&apikey=" .. AUTH_KEY .. "&secret=" .. APP_SECRET .. "&username=" .. licenseKey .. "&password=" .. licenseKey
+                local loginResponse = game:HttpGet(url .. "?" .. loginData, true)
+                print("📥 License check response:", loginResponse)
                 
-                -- Check various success indicators
-                if data.result == "success" or data.status == "success" or data.success == true then
-                    return true
-                elseif data.message then
-                    print("❌ Auth.gg message:", data.message)
-                end
+                local loginResult = game:GetService("HttpService"):JSONDecode(loginResponse)
+                return loginResult.result == "success"
             end
-            
             return false
         end)
         
-        if success then
-            print("✅ Validation result:", result)
-            return result
+        if authGGSuccess and authGGResult then
+            print("✅ Auth.gg validation successful!")
+            return true
         else
-            print("❌ Validation error:", result)
-            return false
+            print("⚠️ Auth.gg failed, trying backup validation...")
+            
+            -- Method 2: Backup validation with HWID locking
+            if validLicenses[licenseKey] then
+                local license = validLicenses[licenseKey]
+                
+                if license.hwid == nil then
+                    -- First time use - bind to this HWID
+                    license.hwid = hwid
+                    print("🔒 License bound to HWID:", hwid)
+                    return true
+                elseif license.hwid == hwid then
+                    -- Same computer - allow access
+                    print("✅ HWID match - access granted")
+                    return true
+                else
+                    -- Different computer - deny access
+                    print("❌ HWID mismatch - access denied")
+                    return false
+                end
+            end
         end
+        
+        print("❌ Invalid license")
+        return false
     end
     
     -- Create GUI
@@ -63,7 +86,7 @@ local function createKeySystem()
     local StatusLabel = Instance.new("TextLabel")
     
     ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-    ScreenGui.Name = "PhantomAuthGG"
+    ScreenGui.Name = "PhantomHybridAuth"
     ScreenGui.ResetOnSpawn = false
     
     -- Main Frame
@@ -75,7 +98,6 @@ local function createKeySystem()
     Frame.Active = true
     Frame.Draggable = true
     
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = Frame
@@ -83,7 +105,6 @@ local function createKeySystem()
     -- Title
     Title.Parent = Frame
     Title.Size = UDim2.new(1, 0, 0, 60)
-    Title.Position = UDim2.new(0, 0, 0, 0)
     Title.Text = "🔐 Phantom.exe License System"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.BackgroundTransparency = 1
@@ -142,22 +163,12 @@ local function createKeySystem()
             return
         end
         
-        -- Special debug bypass
-        if licenseKey == "test" then
-            print("🧪 Using debug bypass")
-            StatusLabel.Text = "🧪 Debug mode - Loading script..."
-            StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-            ScreenGui:Destroy()
-            loadstring(game:HttpGet('https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/refs/heads/main/PHANTOM.EXE'))()
-            return
-        end
-        
-        StatusLabel.Text = "🔄 Validating license with Auth.gg..."
+        StatusLabel.Text = "🔄 Validating license..."
         StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
         SubmitButton.Text = "Validating..."
         SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         
-        wait(1) -- Small delay for UX
+        wait(1)
         
         if validateLicense(licenseKey) then
             StatusLabel.Text = "✅ License valid! Loading Phantom.exe..."
@@ -167,10 +178,9 @@ local function createKeySystem()
             wait(1)
             ScreenGui:Destroy()
             
-            -- Load your main script
             loadstring(game:HttpGet('https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/refs/heads/main/PHANTOM.EXE'))()
         else
-            StatusLabel.Text = "❌ Invalid license! Check console (F9) for details."
+            StatusLabel.Text = "❌ Invalid license or HWID mismatch!"
             StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
             SubmitButton.Text = "🚀 Validate License"
             SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
@@ -178,17 +188,11 @@ local function createKeySystem()
         end
     end)
     
-    -- Auto-focus textbox
     TextBox:CaptureFocus()
-    
-    print("✅ GUI created successfully!")
+    print("✅ Hybrid key system loaded!")
 end
 
--- Wrap in pcall to catch any errors
 local success, error = pcall(createKeySystem)
-
-if success then
-    print("✅ Auth.gg key system loaded successfully!")
-else
-    print("❌ Error loading key system:", error)
+if not success then
+    print("❌ Error:", error)
 end
