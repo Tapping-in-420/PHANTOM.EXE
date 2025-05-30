@@ -229,13 +229,13 @@ local function createKeyAuthSystem()
     buttonGradient.Rotation = 90 -- Vertical gradient
     buttonGradient.Parent = SubmitButton
     
-    -- Add subtle shine/highlight effect
+    -- Add bright shine/highlight effect (balanced)
     local shineFrame = Instance.new("Frame")
     shineFrame.Parent = SubmitButton
-    shineFrame.Size = UDim2.new(1, 0, 0.25, 0)  -- Smaller shine area
+    shineFrame.Size = UDim2.new(1, 0, 0.35, 0)  -- Good shine coverage
     shineFrame.Position = UDim2.new(0, 0, 0, 0)
     shineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    shineFrame.BackgroundTransparency = 0.7  -- More transparent
+    shineFrame.BackgroundTransparency = 0.6  -- Balanced transparency
     shineFrame.BorderSizePixel = 0
     shineFrame.ZIndex = SubmitButton.ZIndex + 1
     
@@ -246,11 +246,11 @@ local function createKeyAuthSystem()
     local shineGradient = Instance.new("UIGradient")
     shineGradient.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 255, 255))  -- Slight cyan tint
     }
     shineGradient.Transparency = NumberSequence.new{
-        ColorSequenceKeypoint.new(0, 0.6),  -- More subtle shine at top
-        ColorSequenceKeypoint.new(1, 1)     -- Fade to invisible
+        ColorSequenceKeypoint.new(0, 0.4),  -- Visible but not overpowering
+        NumberSequenceKeypoint.new(1, 1)     -- Fade to invisible
     }
     shineGradient.Rotation = 90
     shineGradient.Parent = shineFrame
