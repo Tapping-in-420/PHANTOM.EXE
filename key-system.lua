@@ -177,13 +177,13 @@ local function createKeyAuthSystem()
     licenseStroke.Transparency = 0.7
     licenseStroke.Parent = LicenseBox
     
-    -- Submit Button (Futuristic neon style)
+    -- Submit Button (Futuristic neon style with pink background)
     SubmitButton.Parent = Frame
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
     SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    SubmitButton.BackgroundColor3 = Color3.fromRGB(50, 0, 100)
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
@@ -193,20 +193,20 @@ local function createKeyAuthSystem()
     buttonCorner.Parent = SubmitButton
     
     local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(0, 255, 255)
+    buttonStroke.Color = Color3.fromRGB(255, 0, 255)
     buttonStroke.Thickness = 2
     buttonStroke.Transparency = 0.3
     buttonStroke.Parent = SubmitButton
     
     -- Hover effect for button
     SubmitButton.MouseEnter:Connect(function()
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(80, 0, 150)
+        SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 150)
         buttonStroke.Thickness = 3
     end)
     
     SubmitButton.MouseLeave:Connect(function()
         if SubmitButton.Text == "Activate License" then
-            SubmitButton.BackgroundColor3 = Color3.fromRGB(50, 0, 100)
+            SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
             buttonStroke.Thickness = 2
         end
     end)
