@@ -202,18 +202,18 @@ local function createKeyAuthSystem()
     SubmitButton.Size = UDim2.new(0.85, 0, 0, 45)
     SubmitButton.Position = UDim2.new(0.075, 0, 0.6, 0)
     SubmitButton.Text = "Activate License"
-    SubmitButton.TextColor3 = Color3.fromRGB(255, 100, 255) -- Bright purple/magenta neon
+    SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
     SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255) -- Bright cyan neon
     SubmitButton.BorderSizePixel = 0
     SubmitButton.TextSize = 16
     SubmitButton.Font = Enum.Font.GothamBold
     SubmitButton.ZIndex = 10  -- Much higher ZIndex to appear above shine
     
-    -- Add neon glow stroke to the text
+    -- Add purple neon glow stroke around the white text
     local textStroke = Instance.new("UIStroke")
-    textStroke.Color = Color3.fromRGB(200, 0, 255) -- Purple glow
-    textStroke.Thickness = 2
-    textStroke.Transparency = 0.3
+    textStroke.Color = Color3.fromRGB(255, 0, 255) -- Bright purple glow around edges
+    textStroke.Thickness = 1
+    textStroke.Transparency = 0.5
     textStroke.Parent = SubmitButton
     
     local buttonCorner = Instance.new("UICorner")
