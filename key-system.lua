@@ -345,13 +345,13 @@ local function createKeySystemGUI()
     statusLabel.Font = Enum.Font.Gotham
     statusLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Fixed: Properly centered
     
-    -- Key input container
+    -- Key input container (fixed: black background)
     local inputContainer = Instance.new("Frame")
     inputContainer.Name = "InputContainer"
     inputContainer.Parent = contentFrame
     inputContainer.Position = UDim2.new(0, 30, 0, 45)
     inputContainer.Size = UDim2.new(1, -60, 0, 45)
-    inputContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    inputContainer.BackgroundColor3 = Color3.fromRGB(10, 15, 35)
     inputContainer.BorderSizePixel = 0
     
     local inputCorner = Instance.new("UICorner")
@@ -422,13 +422,13 @@ local function createKeySystemGUI()
     buttonContainer.Size = UDim2.new(1, -60, 0, 35)
     buttonContainer.BackgroundTransparency = 1
     
-    -- Get key button
+    -- Get key button (fixed: black background)
     local getKeyButton = Instance.new("TextButton")
     getKeyButton.Name = "GetKeyButton"
     getKeyButton.Parent = buttonContainer
     getKeyButton.Position = UDim2.new(0, 0, 0, 0)
     getKeyButton.Size = UDim2.new(0.48, 0, 1, 0)
-    getKeyButton.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+    getKeyButton.BackgroundColor3 = Color3.fromRGB(10, 15, 35)
     getKeyButton.Text = "🔑 Get Key"
     getKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     getKeyButton.TextSize = 13
@@ -536,7 +536,7 @@ local function createKeySystemGUI()
     end
     
     addHoverEffect(validateButton, Color3.fromRGB(186, 85, 211), Color3.fromRGB(138, 43, 226))
-    addHoverEffect(getKeyButton, Color3.fromRGB(60, 60, 75), Color3.fromRGB(40, 40, 55))
+    addHoverEffect(getKeyButton, Color3.fromRGB(30, 35, 55), Color3.fromRGB(10, 15, 35))
     addHoverEffect(discordButton, Color3.fromRGB(108, 121, 255), Color3.fromRGB(88, 101, 242))
     
     -- FIXED: Special hover effect for close button (red hover, no background)
