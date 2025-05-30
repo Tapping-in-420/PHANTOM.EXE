@@ -175,8 +175,6 @@ end
 -- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
 -- Updated GUI with Centered Header (Replace the GUI section in your key-system.lua)
 -- ==================================================================================
--- GUI CODE STARTS HERE - REPLACE THIS SECTION FOR FUTURE GUI UPDATES
--- ==================================================================================
 local function createKeySystemGUI()
     -- Destroy existing GUI if it exists
     if keySystemGUI then
@@ -213,13 +211,13 @@ local function createKeySystemGUI()
     corner.CornerRadius = UDim.new(0, 20)
     corner.Parent = mainFrame
     
-    -- Outer glow effect
+    -- Outer glow effect (child of main frame so it moves together)
     local glowFrame = Instance.new("Frame")
     glowFrame.Name = "GlowFrame"
-    glowFrame.Parent = keySystemGUI
+    glowFrame.Parent = mainFrame
     glowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     glowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    glowFrame.Size = UDim2.new(0, 500, 0, 370)
+    glowFrame.Size = UDim2.new(1, 20, 1, 20)
     glowFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     glowFrame.BackgroundTransparency = 0.8
     glowFrame.ZIndex = mainFrame.ZIndex - 1
@@ -229,13 +227,13 @@ local function createKeySystemGUI()
     glowCorner.CornerRadius = UDim.new(0, 25)
     glowCorner.Parent = glowFrame
     
-    -- Purple accent border
+    -- Purple accent border (child of main frame so it moves together)
     local accentBorder = Instance.new("Frame")
     accentBorder.Name = "AccentBorder"
-    accentBorder.Parent = keySystemGUI
+    accentBorder.Parent = mainFrame
     accentBorder.AnchorPoint = Vector2.new(0.5, 0.5)
     accentBorder.Position = UDim2.new(0.5, 0, 0.5, 0)
-    accentBorder.Size = UDim2.new(0, 484, 0, 354)
+    accentBorder.Size = UDim2.new(1, 4, 1, 4)
     accentBorder.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
     accentBorder.BackgroundTransparency = 0.3
     accentBorder.ZIndex = mainFrame.ZIndex - 1
@@ -334,18 +332,18 @@ local function createKeySystemGUI()
     contentFrame.Size = UDim2.new(1, 0, 1, -80)
     contentFrame.BackgroundTransparency = 1
     
-    -- Status label
+    -- Status label (properly centered)
     local statusLabel = Instance.new("TextLabel")
     statusLabel.Name = "StatusLabel"
     statusLabel.Parent = contentFrame
-    statusLabel.Position = UDim2.new(0, 30, 0, 15)
-    statusLabel.Size = UDim2.new(1, -60, 0, 25)
+    statusLabel.Position = UDim2.new(0, 0, 0, 15)
+    statusLabel.Size = UDim2.new(1, 0, 0, 25)
     statusLabel.BackgroundTransparency = 1
     statusLabel.Text = "Enter your authentication key to continue"
     statusLabel.TextColor3 = Color3.fromRGB(200, 200, 220)
     statusLabel.TextSize = 15
     statusLabel.Font = Enum.Font.Gotham
-    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Center
     
     -- Key input container
     local inputContainer = Instance.new("Frame")
@@ -728,9 +726,6 @@ local function createKeySystemGUI()
     
     return keySystemGUI
 end
--- ==================================================================================
--- GUI CODE ENDS HERE - REPLACE UNTIL THIS LINE FOR FUTURE GUI UPDATES
--- ==================================================================================
 -- ==================================================================================
 -- GUI CODE ENDS HERE - REPLACE UNTIL THIS LINE FOR FUTURE GUI UPDATES
 -- ==================================================================================
