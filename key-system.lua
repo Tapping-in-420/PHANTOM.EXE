@@ -103,13 +103,14 @@ local function makeRequest(endpoint, method, data, maxRetries)
             return false, "Standard HTTP failed"
         end
         
-        -- Method 2: game:HttpGet/HttpPost
+        -- Method 2: game:HttpGet/HttpPost (Fixed)
         local function tryGameHttp()
             local success, response = pcall(function()
                 if httpMethod == "GET" and game.HttpGet then
                     return game:HttpGet(fullUrl, true)
                 elseif httpMethod == "POST" and game.HttpPost then
-                    return game:HttpPost(fullUrl, HttpService:JSONEncode(requestData or {}), true, "application/json")
+                    -- Some games don't have HttpPost, so we'll skip this
+                    return nil
                 end
                 return nil
             end)
@@ -466,7 +467,7 @@ local function detectEnvironment()
     -- Detect HTTP methods
     if HttpService then table.insert(methods, "HttpService") end
     if game.HttpGet then table.insert(methods, "game:HttpGet") end
-    if game.HttpPost then table.insert(methods, "game:HttpPost") end
+    -- Removed game.HttpPost as it's not available in all games
     
     -- Modern Executor Detection (2024+)
     
