@@ -169,17 +169,17 @@ local function createPhantomGhost()
     mouthCorner.CornerRadius = UDim.new(0, 3)
     mouthCorner.Parent = mouth
     
-    -- Purple spinning wheel under ghost
+    -- Purple spinning wheel under ghost (BIGGER!)
     local spinningWheel = Instance.new("Frame")
     spinningWheel.Name = "SpinningWheel"
     spinningWheel.Parent = ghostFrame
-    spinningWheel.Position = UDim2.new(0.5, 0, 1, 20)
+    spinningWheel.Position = UDim2.new(0.5, 0, 1, 25)
     spinningWheel.AnchorPoint = Vector2.new(0.5, 0.5)
-    spinningWheel.Size = UDim2.new(0, 30, 0, 30)
+    spinningWheel.Size = UDim2.new(0, 50, 0, 50)
     spinningWheel.BackgroundTransparency = 1
     spinningWheel.BorderSizePixel = 0
     
-    -- Create spinning wheel segments
+    -- Create spinning wheel segments (BIGGER!)
     local wheelSegments = {}
     for i = 1, 8 do
         local segment = Instance.new("Frame")
@@ -187,7 +187,7 @@ local function createPhantomGhost()
         segment.Parent = spinningWheel
         segment.AnchorPoint = Vector2.new(0.5, 0)
         segment.Position = UDim2.new(0.5, 0, 0.5, 0)
-        segment.Size = UDim2.new(0, 3, 0, 10)
+        segment.Size = UDim2.new(0, 4, 0, 18)
         segment.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
         segment.BorderSizePixel = 0
         
@@ -196,7 +196,7 @@ local function createPhantomGhost()
         segment.Rotation = angle
         
         -- Fade segments for spinning effect
-        local fadeLevel = 1 - ((i - 1) / 8) * 0.8
+        local fadeLevel = 1 - ((i - 1) / 8) * 0.7
         segment.BackgroundTransparency = fadeLevel
         
         local segmentCorner = Instance.new("UICorner")
@@ -298,12 +298,12 @@ local function createPhantomGhost()
         spinTween:Play()
         table.insert(animations, spinTween)
         
-        -- Animate segment fade cycling for better spinning effect
+        -- Animate segment fade cycling for better spinning effect (LESS FADE!)
         task.spawn(function()
             while spinningWheel.Parent do
                 for i, segment in pairs(wheelSegments) do
-                    local fadeLevel = 1 - ((i - 1) / 8) * 0.8
-                    local nextFadeLevel = 1 - (i / 8) * 0.8
+                    local fadeLevel = 1 - ((i - 1) / 8) * 0.7
+                    local nextFadeLevel = 1 - (i / 8) * 0.7
                     
                     TweenService:Create(segment, TweenInfo.new(0.125, Enum.EasingStyle.Linear), {
                         BackgroundTransparency = nextFadeLevel
