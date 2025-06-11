@@ -169,25 +169,42 @@ local function createPhantomGhost()
     mouthCorner.CornerRadius = UDim.new(0, 3)
     mouthCorner.Parent = mouth
     
-    -- Status text
-    local statusText = Instance.new("TextLabel")
-    statusText.Name = "StatusText"
-    statusText.Parent = ghostFrame
-    statusText.Position = UDim2.new(0.5, 0, 0, -35)
-    statusText.AnchorPoint = Vector2.new(0.5, 0.5)
-    statusText.Size = UDim2.new(0, 200, 0, 25)
-    statusText.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    statusText.BackgroundTransparency = 0.2
-    statusText.Text = "👻 Phantom Loading..."
-    statusText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    statusText.TextSize = 14
-    statusText.Font = Enum.Font.GothamBold
-    statusText.TextXAlignment = Enum.TextXAlignment.Center
-    statusText.BorderSizePixel = 0
+    -- Purple spinning wheel under ghost
+    local spinningWheel = Instance.new("Frame")
+    spinningWheel.Name = "SpinningWheel"
+    spinningWheel.Parent = ghostFrame
+    spinningWheel.Position = UDim2.new(0.5, 0, 1, 20)
+    spinningWheel.AnchorPoint = Vector2.new(0.5, 0.5)
+    spinningWheel.Size = UDim2.new(0, 30, 0, 30)
+    spinningWheel.BackgroundTransparency = 1
+    spinningWheel.BorderSizePixel = 0
     
-    local statusCorner = Instance.new("UICorner")
-    statusCorner.CornerRadius = UDim.new(0, 8)
-    statusCorner.Parent = statusText
+    -- Create spinning wheel segments
+    local wheelSegments = {}
+    for i = 1, 8 do
+        local segment = Instance.new("Frame")
+        segment.Name = "Segment" .. i
+        segment.Parent = spinningWheel
+        segment.AnchorPoint = Vector2.new(0.5, 0)
+        segment.Position = UDim2.new(0.5, 0, 0.5, 0)
+        segment.Size = UDim2.new(0, 3, 0, 10)
+        segment.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+        segment.BorderSizePixel = 0
+        
+        -- Rotate each segment
+        local angle = (i - 1) * 45 -- 8 segments, 45 degrees apart
+        segment.Rotation = angle
+        
+        -- Fade segments for spinning effect
+        local fadeLevel = 1 - ((i - 1) / 8) * 0.8
+        segment.BackgroundTransparency = fadeLevel
+        
+        local segmentCorner = Instance.new("UICorner")
+        segmentCorner.CornerRadius = UDim.new(0, 2)
+        segmentCorner.Parent = segment
+        
+        table.insert(wheelSegments, segment)
+    end
     
     -- Particle system
     local particles = {}
@@ -273,12 +290,29 @@ local function createPhantomGhost()
         end)
     end
     
-    -- Status text fade animation
-    local textTween = TweenService:Create(statusText, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-        TextTransparency = 0.3
-    })
-    textTween:Play()
-    table.insert(animations, textTween)
+    -- Spinning wheel animation
+    local function animateSpinningWheel()
+        local spinTween = TweenService:Create(spinningWheel, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {
+            Rotation = 360
+        })
+        spinTween:Play()
+        table.insert(animations, spinTween)
+        
+        -- Animate segment fade cycling for better spinning effect
+        task.spawn(function()
+            while spinningWheel.Parent do
+                for i, segment in pairs(wheelSegments) do
+                    local fadeLevel = 1 - ((i - 1) / 8) * 0.8
+                    local nextFadeLevel = 1 - (i / 8) * 0.8
+                    
+                    TweenService:Create(segment, TweenInfo.new(0.125, Enum.EasingStyle.Linear), {
+                        BackgroundTransparency = nextFadeLevel
+                    }):Play()
+                end
+                wait(0.125)
+            end
+        end)
+    end
     
     -- Start particle spawning
     local particleConnection = task.spawn(function()
