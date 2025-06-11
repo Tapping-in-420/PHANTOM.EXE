@@ -937,8 +937,6 @@ local function createKeySystemGUI()
                     statusLabel.Text = statusLabel.Text .. " (Connected)"
                 end
                 
-                isValidated = true
-                
                 wait(1)
                 
                 -- Close key system GUI first
@@ -949,7 +947,11 @@ local function createKeySystemGUI()
                 -- Show the phantom ghost loading effect
                 createPhantomGhost()
                 
-                -- Ghost will auto-destroy after 2 seconds
+                -- Wait for ghost to complete (2+ seconds) BEFORE setting validation
+                wait(2.5)
+                
+                -- NOW set validated to true (this triggers main script)
+                isValidated = true
                 
             else
                 local errorDetails = "❌ " .. reason
