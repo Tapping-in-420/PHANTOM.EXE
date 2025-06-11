@@ -102,14 +102,13 @@ local function createPhantomGhost()
     bodyStroke.Transparency = 0.2
     bodyStroke.Parent = ghostBody
     
-    -- Ghost bottom wavy part
+    -- Ghost bottom wavy part (FIXED - no rectangle background!)
     local ghostBottom = Instance.new("Frame")
     ghostBottom.Name = "GhostBottom"
     ghostBottom.Parent = ghostBody
     ghostBottom.Position = UDim2.new(0, 0, 1, -20)
     ghostBottom.Size = UDim2.new(1, 0, 0, 20)
-    ghostBottom.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    ghostBottom.BackgroundTransparency = 0.1
+    ghostBottom.BackgroundTransparency = 1  -- INVISIBLE background!
     ghostBottom.BorderSizePixel = 0
     
     -- Create ghost waves
@@ -169,42 +168,7 @@ local function createPhantomGhost()
     mouthCorner.CornerRadius = UDim.new(0, 3)
     mouthCorner.Parent = mouth
     
-    -- Purple spinning wheel under ghost (BIGGER!)
-    local spinningWheel = Instance.new("Frame")
-    spinningWheel.Name = "SpinningWheel"
-    spinningWheel.Parent = ghostFrame
-    spinningWheel.Position = UDim2.new(0.5, 0, 1, 25)
-    spinningWheel.AnchorPoint = Vector2.new(0.5, 0.5)
-    spinningWheel.Size = UDim2.new(0, 50, 0, 50)
-    spinningWheel.BackgroundTransparency = 1
-    spinningWheel.BorderSizePixel = 0
-    
-    -- Create spinning wheel segments (BIGGER!)
-    local wheelSegments = {}
-    for i = 1, 8 do
-        local segment = Instance.new("Frame")
-        segment.Name = "Segment" .. i
-        segment.Parent = spinningWheel
-        segment.AnchorPoint = Vector2.new(0.5, 0)
-        segment.Position = UDim2.new(0.5, 0, 0.5, 0)
-        segment.Size = UDim2.new(0, 4, 0, 18)
-        segment.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-        segment.BorderSizePixel = 0
-        
-        -- Rotate each segment
-        local angle = (i - 1) * 45 -- 8 segments, 45 degrees apart
-        segment.Rotation = angle
-        
-        -- Fade segments for spinning effect
-        local fadeLevel = 1 - ((i - 1) / 8) * 0.7
-        segment.BackgroundTransparency = fadeLevel
-        
-        local segmentCorner = Instance.new("UICorner")
-        segmentCorner.CornerRadius = UDim.new(0, 2)
-        segmentCorner.Parent = segment
-        
-        table.insert(wheelSegments, segment)
-    end
+    -- No spinning wheel - keeping it clean! 👻
     
     -- Particle system
     local particles = {}
