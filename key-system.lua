@@ -68,14 +68,7 @@ local function createPhantomGhost()
     ghostGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ghostGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     
-    -- Background overlay
-    local overlay = Instance.new("Frame")
-    overlay.Name = "Overlay"
-    overlay.Parent = ghostGui
-    overlay.Size = UDim2.new(1, 0, 1, 0)
-    overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    overlay.BackgroundTransparency = 0.3
-    overlay.BorderSizePixel = 0
+    -- No background overlay - just the ghost floating
     
     -- Ghost container frame
     local ghostFrame = Instance.new("Frame")
@@ -303,20 +296,14 @@ local function createPhantomGhost()
         end
     end)
     
-    -- Entrance animation
+    -- Entrance animation (no overlay)
     ghostFrame.Size = UDim2.new(0, 0, 0, 0)
-    overlay.BackgroundTransparency = 1
     
     local entranceTween = TweenService:Create(ghostFrame, TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 120, 0, 140)
     })
     
-    local overlayTween = TweenService:Create(overlay, TweenInfo.new(0.5, Enum.EasingStyle.Sine), {
-        BackgroundTransparency = 0.3
-    })
-    
     entranceTween:Play()
-    overlayTween:Play()
     
     -- Auto-destroy after 2 seconds with exit animation
     task.spawn(function()
@@ -327,18 +314,13 @@ local function createPhantomGhost()
             animation:Cancel()
         end
         
-        -- Exit animation
+        -- Exit animation (no overlay)
         local exitTween = TweenService:Create(ghostFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Size = UDim2.new(0, 0, 0, 0),
             Position = UDim2.new(0.5, 0, 0.5, -20)
         })
         
-        local overlayExitTween = TweenService:Create(overlay, TweenInfo.new(0.6, Enum.EasingStyle.Sine), {
-            BackgroundTransparency = 1
-        })
-        
         exitTween:Play()
-        overlayExitTween:Play()
         
         exitTween.Completed:Connect(function()
             ghostGui:Destroy()
@@ -959,14 +941,15 @@ local function createKeySystemGUI()
                 
                 wait(1)
                 
+                -- Close key system GUI first
+                keySystemGUI:Destroy()
+                
+                wait(0.5) -- Small pause
+                
                 -- Show the phantom ghost loading effect
                 createPhantomGhost()
                 
-                -- Wait for ghost animation to complete (2 seconds)
-                wait(2.5)
-                
-                -- Destroy the key system GUI
-                keySystemGUI:Destroy()
+                -- Ghost will auto-destroy after 2 seconds
                 
             else
                 local errorDetails = "❌ " .. reason
