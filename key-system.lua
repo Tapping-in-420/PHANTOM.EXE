@@ -291,36 +291,49 @@ local function makeLuarmorRequest(endpoint, method, data)
     return false, lastError
 end
 
--- NEW: Luarmor key validation
+-- NEW: Luarmor key validation using their library
 local function validateKeyWithLuarmor(key, hwid)
     print("🔑 Validating with Luarmor: " .. key)
     print("🔒 HWID: " .. hwid)
     
-    -- Luarmor validation endpoint
-    local endpoint = "/validate"
+    -- Use Luarmor's official key checking library
+    local success, luarmorAPI = pcall(function()
+        return loadstring(game:HttpGet("https://sdkapi-public.luarmor.net/library.lua"))()
+    end)
     
-    local requestData = {
-        project_id = CONFIG.LUARMOR_PROJECT_ID,
-        license_key = key,
-        hwid = hwid,
-        -- Optional: add user info
-        user_id = tostring(LocalPlayer.UserId),
-        username = LocalPlayer.Name
-    }
+    if not success or not luarmorAPI then
+        print("❌ Failed to load Luarmor library")
+        return false, "Failed to load Luarmor validation library", 0
+    end
     
-    local success, response = makeLuarmorRequest(endpoint, "POST", requestData)
+    -- Set the script ID (your project ID)
+    luarmorAPI.script_id = CONFIG.LUARMOR_PROJECT_ID
     
-    if success and response then
-        print("✅ Luarmor response received")
+    -- Set the global script_key that Luarmor expects
+    getgenv().script_key = key
+    
+    -- Check the key using Luarmor's API
+    local status = luarmorAPI.check_key(key)
+    
+    if status and status.code then
+        print("✅ Luarmor response: " .. status.code)
+        print("📝 Message: " .. (status.message or "No message"))
         
-        -- Parse Luarmor response
-        local isValid = response.valid or response.success or false
-        local reason = response.message or response.error or "Unknown"
-        local timeLeft = response.expires_in or response.time_left or 0
+        local isValid = status.code == "KEY_VALID"
+        local reason = status.message or "Unknown"
+        local timeLeft = 0
+        local userInfo = {}
+        local licenseInfo = {}
         
-        -- Additional Luarmor data you might want to use
-        local userInfo = response.user or {}
-        local licenseInfo = response.license or {}
+        -- Extract additional data if available
+        if status.data then
+            timeLeft = status.data.auth_expire or 0
+            -- Convert unix timestamp to seconds remaining
+            if timeLeft > 0 then
+                timeLeft = timeLeft - os.time()
+                if timeLeft < 0 then timeLeft = 0 end
+            end
+        end
         
         print("📊 Valid: " .. tostring(isValid) .. " | Reason: " .. reason)
         
@@ -330,8 +343,8 @@ local function validateKeyWithLuarmor(key, hwid)
         
         return isValid, reason, timeLeft, userInfo, licenseInfo
     else
-        print("❌ Luarmor validation failed: " .. tostring(response))
-        return false, "Connection to Luarmor failed: " .. tostring(response), 0
+        print("❌ Invalid Luarmor response")
+        return false, "Invalid response from Luarmor", 0
     end
 end
 
