@@ -14,6 +14,7 @@ local CONFIG = {
     APP_NAME = "Phantom Executor",
     VERSION = "2.1",
     DISCORD_INVITE = "https://discord.gg/yourserver", -- UPDATE THIS
+    AD_LINK = "https://ads.luarmor.net/get_key?for=YOUR_PROJECT_CODE", -- UPDATE WITH YOUR ACTUAL AD LINK
     
     MAX_RETRIES = 3,
     RETRY_DELAY = 1,
@@ -677,11 +678,11 @@ local function createKeySystemGUI()
     
     getKeyButton.MouseButton1Click:Connect(function()
         if setclipboard then
-            setclipboard(CONFIG.DISCORD_INVITE)
-            statusLabel.Text = "✅ Discord invite copied to clipboard!"
+            setclipboard(CONFIG.AD_LINK)
+            statusLabel.Text = "✅ Get key link copied to clipboard!"
             statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
         else
-            statusLabel.Text = "🔗 Discord: " .. CONFIG.DISCORD_INVITE
+            statusLabel.Text = "🔗 Get Key: " .. CONFIG.AD_LINK
             statusLabel.TextColor3 = Color3.fromRGB(138, 43, 226)
         end
     end)
@@ -742,8 +743,26 @@ local function createKeySystemGUI()
                 -- Wait for ghost to complete
                 wait(2.5)
                 
+                -- Set the global script_key for tracking
+                getgenv().script_key = key
+                _G.script_key = key
+                
                 -- Set validated to true
                 isValidated = true
+                
+                -- NOW LOAD THE SCRIPT USING LUARMOR'S OFFICIAL METHOD
+                -- This ensures execution tracking works properly
+                print("🚀 Loading script via Luarmor tracking...")
+                
+                -- Use Luarmor's load_script method for proper tracking
+                pcall(function()
+                    luarmorAPI.load_script()
+                end)
+                
+                -- Fallback: Load your GitHub script if Luarmor loader fails
+                wait(1)
+                print("🔄 Loading main script from GitHub...")
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/main/PHANTOM.EXE"))()
                 
             else
                 local errorDetails = "❌ " .. reason
