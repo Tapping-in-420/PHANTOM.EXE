@@ -297,6 +297,10 @@ local function validateKeyWithLuarmor(key, hwid)
     print("🔑 Validating with Luarmor: " .. key)
     print("🔒 HWID: " .. hwid)
     
+    -- IMPORTANT: Set the script_key FIRST for proper tracking
+    getgenv().script_key = key
+    _G.script_key = key
+    
     -- Use Luarmor's official key checking library
     local success, luarmorAPI = pcall(function()
         return loadstring(game:HttpGet("https://sdkapi-public.luarmor.net/library.lua"))()
@@ -309,9 +313,6 @@ local function validateKeyWithLuarmor(key, hwid)
     
     -- Set the script ID (your script ID, not project ID)
     luarmorAPI.script_id = CONFIG.LUARMOR_SCRIPT_ID
-    
-    -- Set the global script_key that Luarmor expects
-    getgenv().script_key = key
     
     -- Check the key using Luarmor's API
     local status = luarmorAPI.check_key(key)
@@ -340,6 +341,11 @@ local function validateKeyWithLuarmor(key, hwid)
         
         if timeLeft > 0 then
             print("⏰ Time remaining: " .. timeLeft .. " seconds")
+        end
+        
+        -- Store the API reference for later use
+        if isValid then
+            getgenv().luarmor_api = luarmorAPI
         end
         
         return isValid, reason, timeLeft, userInfo, licenseInfo
@@ -750,19 +756,34 @@ local function createKeySystemGUI()
                 -- Set validated to true
                 isValidated = true
                 
-                -- NOW LOAD THE SCRIPT USING LUARMOR'S OFFICIAL METHOD
+                -- NOW LOAD THE SCRIPT USING LUARMOR'S OFFICIAL METHOD FOR TRACKING
                 -- This ensures execution tracking works properly
                 print("🚀 Loading script via Luarmor tracking...")
                 
-                -- Use Luarmor's load_script method for proper tracking
-                pcall(function()
-                    luarmorAPI.load_script()
-                end)
+                -- Method 1: Try to use Luarmor's load_script for tracking
+                local trackingSuccess = false
+                if getgenv().luarmor_api then
+                    local success = pcall(function()
+                        getgenv().luarmor_api.load_script()
+                        trackingSuccess = true
+                    end)
+                    if success and trackingSuccess then
+                        print("✅ Luarmor tracking enabled!")
+                    else
+                        print("⚠️ Luarmor tracking failed, using GitHub fallback")
+                    end
+                end
                 
-                -- Fallback: Load your GitHub script if Luarmor loader fails
-                wait(1)
-                print("🔄 Loading main script from GitHub...")
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/main/PHANTOM.EXE"))()
+                -- Method 2: Load from GitHub with proper script_key set (fallback)
+                if not trackingSuccess then
+                    wait(1)
+                    print("🔄 Loading main script from GitHub with tracking...")
+                    
+                    -- CRITICAL: Load with script_key already set for tracking
+                    pcall(function()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/Tapping-in-420/PHANTOM.EXE/main/PHANTOM.EXE"))()
+                    end)
+                end
                 
             else
                 local errorDetails = "❌ " .. reason
