@@ -6,7 +6,7 @@ local PhantomKeySystem = {}
 -- Configuration - YOUR ACTUAL LUARMOR DETAILS
 local CONFIG = {
     -- Luarmor Configuration
-    LUARMOR_PROJECT_ID = "a167a492fe4ecaf4793689a3b3d58f74", -- Your actual Project ID
+    LUARMOR_SCRIPT_ID = "b9bda4c2ccfe3b63ed5f7f8f038fee41", -- Your actual Script ID (not project ID)
     LUARMOR_API_KEY = "d0b0c5e6962fca6e760152ea5cc4a44ef28e295fb3993931b8e2", -- Your actual API Key
     LUARMOR_BASE_URL = "https://api.luarmor.net/v3",
     
@@ -306,8 +306,8 @@ local function validateKeyWithLuarmor(key, hwid)
         return false, "Failed to load Luarmor validation library", 0
     end
     
-    -- Set the script ID (your project ID)
-    luarmorAPI.script_id = CONFIG.LUARMOR_PROJECT_ID
+    -- Set the script ID (your script ID, not project ID)
+    luarmorAPI.script_id = CONFIG.LUARMOR_SCRIPT_ID
     
     -- Set the global script_key that Luarmor expects
     getgenv().script_key = key
