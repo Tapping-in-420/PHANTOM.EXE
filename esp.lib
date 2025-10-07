@@ -485,7 +485,7 @@ local espLibrary = {
             Thickness = 1
         }),
         boxOutline = create("Square", {
-            Thickness = 3,
+            Thickness = 1,
             Color = color3New()
         }),
         boxFill = create("Square", {
