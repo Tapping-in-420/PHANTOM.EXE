@@ -491,6 +491,9 @@ local espLibrary = {
         boxFill = create("Square", {
             Thickness = 1,
             Filled = true
+        }),
+        chams = create("Highlight", {
+            Parent = screenGui,
         })
     };
   end
@@ -504,6 +507,9 @@ local espLibrary = {
         cache.box:Remove();
         cache.boxOutline:Remove();
         cache.boxFill:Remove();
+        if cache.chams then
+            cache.chams:Destroy();
+        end
     end
     
     -- Clean up object-specific connections
@@ -538,6 +544,11 @@ local espLibrary = {
     options.boxTransparency = options.boxTransparency or 1;
     options.boxFillColor = options.boxFillColor or color3New(1, 1, 1);
     options.boxFillTransparency = options.boxFillTransparency or 0.5;
+    options.showChams = options.showChams or false;
+    options.chamsFillColor = options.chamsFillColor or color3New(1, 0, 0);
+    options.chamsFillTransparency = options.chamsFillTransparency or 0.5;
+    options.chamsOutlineColor = options.chamsOutlineColor or color3New(0, 0, 0);
+    options.chamsOutlineTransparency = options.chamsOutlineTransparency or 0;
     
     -- Box size logic: if not using boxes, require boxSize argument
     if not options.showBox then
@@ -934,6 +945,19 @@ local espLibrary = {
                 cache.box.Visible = false;
                 cache.boxOutline.Visible = false;
                 cache.boxFill.Visible = false;
+            end
+            
+            -- Chams ESP
+            if cache.options.showChams and canShow then
+                cache.chams.Enabled = true;
+                cache.chams.DepthMode = cache.options.visibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
+                cache.chams.Adornee = object;
+                cache.chams.FillColor = cache.options.chamsFillColor;
+                cache.chams.FillTransparency = cache.options.chamsFillTransparency;
+                cache.chams.OutlineColor = cache.options.chamsOutlineColor;
+                cache.chams.OutlineTransparency = cache.options.chamsOutlineTransparency;
+            else
+                cache.chams.Enabled = false;
             end
         end
     end);
