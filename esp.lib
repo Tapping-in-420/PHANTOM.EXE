@@ -919,6 +919,7 @@ local espLibrary = {
                 
                 -- Box outline
                 cache.boxOutline.Visible = true;
+                cache.boxOutline.Color = cache.options.boxColor;
                 cache.boxOutline.Transparency = cache.options.boxTransparency;
                 cache.boxOutline.Size = boxSize;
                 cache.boxOutline.Position = boxPosition;
