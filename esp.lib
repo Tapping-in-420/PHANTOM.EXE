@@ -287,7 +287,29 @@ local espLibrary = {
         local oMin, oMax = vector3New(minX, minY, minZ), vector3New(maxX, maxY, maxZ);
         return (oMax + oMin) * 0.5, oMax - oMin;
     else
-        return torso.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
+        -- Handle both character/torso and model cases
+        if torso and torso.Position then
+            return torso.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
+        elseif character and character.PrimaryPart and character.PrimaryPart.Position then
+            return character.PrimaryPart.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
+        else
+            -- Fallback for models without PrimaryPart
+            local modelPosition = vector3New(0, 0, 0);
+            local partCount = 0;
+            
+            for _, part in next, getChildren(character) do
+                if (isA(part, "BasePart")) then
+                    modelPosition = modelPosition + part.Position;
+                    partCount = partCount + 1;
+                end
+            end
+            
+            if partCount > 0 then
+                modelPosition = modelPosition / partCount;
+            end
+            
+            return modelPosition, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
+        end
     end
   end
   
@@ -884,7 +906,39 @@ local espLibrary = {
                 partPosition = object.Position;
                 objectSize = object.Size;
             elseif (object:IsA("Model")) then
-                partPosition, objectSize = self.getBoundingBox(object);
+                -- Safe call to getBoundingBox with error handling
+                local success, result1, result2 = pcall(function()
+                    return self.getBoundingBox(object);
+                end)
+                
+                if success and result1 and result2 then
+                    partPosition, objectSize = result1, result2;
+                else
+                    -- Fallback: try to get PrimaryPart or calculate average position
+                    if object.PrimaryPart then
+                        partPosition = object.PrimaryPart.Position;
+                        objectSize = object.PrimaryPart.Size;
+                    else
+                        -- Calculate average position of all parts
+                        local totalPosition = vector3New(0, 0, 0);
+                        local partCount = 0;
+                        
+                        for _, part in next, object:GetChildren() do
+                            if part:IsA("BasePart") then
+                                totalPosition = totalPosition + part.Position;
+                                partCount = partCount + 1;
+                            end
+                        end
+                        
+                        if partCount > 0 then
+                            partPosition = totalPosition / partCount;
+                            objectSize = vector3New(4, 4, 4); -- Default size
+                        else
+                            -- Skip this object if we can't get position
+                            continue;
+                        end
+                    end
+                end
             end
   
             local distance = (currentCamera.CFrame.Position - partPosition).Magnitude;
