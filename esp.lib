@@ -505,6 +505,17 @@ local espLibrary = {
         cache.boxOutline:Remove();
         cache.boxFill:Remove();
     end
+    
+    -- Clean up object-specific connections
+    if espLibrary.objectConnections and espLibrary.objectConnections[object] then
+        local connections = espLibrary.objectConnections[object];
+        for _, conn in pairs(connections) do
+            if conn and conn.Connected then
+                conn:Disconnect();
+            end
+        end
+        espLibrary.objectConnections[object] = nil;
+    end
   end
   
   function espLibrary:AddObjectEsp(object, defaultOptions)
@@ -531,11 +542,42 @@ local espLibrary = {
   
     self.addObject(object, options);
   
-    insert(self.conns, object.Parent.ChildRemoved:Connect(function(child)
-        if (child == object) then
-            self.removeObject(child);
+    -- Multiple cleanup connections for better reliability
+    local connections = {};
+    
+    -- Connection 1: Parent ChildRemoved
+    if object.Parent then
+        connections.parentRemoved = object.Parent.ChildRemoved:Connect(function(child)
+            if (child == object) then
+                self.removeObject(object);
+            end
+        end);
+    end
+    
+    -- Connection 2: Object AncestryChanged (for when object is moved/deleted)
+    connections.ancestryChanged = object.AncestryChanged:Connect(function()
+        if not object.Parent then
+            self.removeObject(object);
         end
-    end));
+    end);
+    
+    -- Connection 3: Object Destroying
+    if object:IsA("Instance") then
+        connections.destroying = object.Destroying:Connect(function()
+            self.removeObject(object);
+        end);
+    end
+    
+    -- Store connections for cleanup
+    if not self.objectConnections then
+        self.objectConnections = {};
+    end
+    self.objectConnections[object] = connections;
+    
+    -- Add to main connections list for global cleanup
+    for _, conn in pairs(connections) do
+        insert(self.conns, conn);
+    end
   
     return options;
   end
@@ -552,6 +594,18 @@ local espLibrary = {
   
     for object, _ in next, self.objectCache do
         self.removeObject(object);
+    end
+  
+    -- Clean up object connections
+    if self.objectConnections then
+        for object, connections in next, self.objectConnections do
+            for _, conn in pairs(connections) do
+                if conn and conn.Connected then
+                    conn:Disconnect();
+                end
+            end
+        end
+        self.objectConnections = {};
     end
   
     for _, object in next, self.instances do
@@ -798,6 +852,12 @@ local espLibrary = {
         end
   
         for object, cache in next, self.objectCache do
+            -- Safety check: remove objects that no longer exist
+            if not object or not object.Parent then
+                self.removeObject(object);
+                continue;
+            end
+            
             local partPosition = vector3New();
             local objectSize = vector3New();
   
