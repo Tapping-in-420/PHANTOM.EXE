@@ -518,7 +518,7 @@ local espLibrary = {
     end
   end
   
-  function espLibrary:AddObjectEsp(object, defaultOptions)
+  function espLibrary:AddObjectEsp(object, defaultOptions, boxSize)
     assert(object and object.Parent, "invalid object passed");
   
     local options = defaultOptions or {};
@@ -538,7 +538,15 @@ local espLibrary = {
     options.boxTransparency = options.boxTransparency or 1;
     options.boxFillColor = options.boxFillColor or color3New(1, 1, 1);
     options.boxFillTransparency = options.boxFillTransparency or 0.5;
-    options.boxSize = options.boxSize or vector2New(50, 50);
+    
+    -- Box size logic: if not using boxes, require boxSize argument
+    if not options.showBox then
+        assert(boxSize, "boxSize argument is required when showBox is false");
+        options.boxSize = boxSize;
+    else
+        -- If using boxes, use provided boxSize or calculate from object
+        options.boxSize = boxSize or options.boxSize;
+    end
   
     self.addObject(object, options);
   
