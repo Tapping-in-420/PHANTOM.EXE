@@ -227,7 +227,7 @@ local espLibrary = {
         if playerFolder then
             local itemFolder = playerFolder:FindFirstChild("ItemFolder")
             if itemFolder then
-                print("Found ItemFolder in attackers team")
+                
                 -- Get the first weapon in the ItemFolder
                 for _, weapon in pairs(itemFolder:GetChildren()) do
                     if weapon:IsA("Model") or weapon:IsA("Folder") then
@@ -244,7 +244,7 @@ local espLibrary = {
         if playerFolder then
             local itemFolder = playerFolder:FindFirstChild("ItemFolder")
             if itemFolder then
-                print("Found ItemFolder in attackers team")
+              
                 -- Get the first weapon in the ItemFolder
                 for _, weapon in pairs(itemFolder:GetChildren()) do
                     if weapon:IsA("Model") or weapon:IsA("Folder") then
