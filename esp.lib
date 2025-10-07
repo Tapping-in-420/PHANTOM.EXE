@@ -799,11 +799,13 @@ local espLibrary = {
   
         for object, cache in next, self.objectCache do
             local partPosition = vector3New();
+            local objectSize = vector3New();
   
             if (object:IsA("BasePart")) then
                 partPosition = object.Position;
+                objectSize = object.Size;
             elseif (object:IsA("Model")) then
-                partPosition = self.getBoundingBox(object);
+                partPosition, objectSize = self.getBoundingBox(object);
             end
   
             local distance = (currentCamera.CFrame.Position - partPosition).Magnitude;
@@ -829,7 +831,15 @@ local espLibrary = {
             
             -- Box ESP
             if cache.options.showBox and canShow then
-                local boxSize = cache.options.boxSize;
+                -- Calculate box size based on object's actual size
+                local scaleFactor = self.getScaleFactor(currentCamera.FieldOfView, (currentCamera.CFrame.Position - partPosition).Magnitude);
+                local calculatedBoxSize = vector2New(
+                    math.max(objectSize.X * scaleFactor, 10), -- Minimum size of 10
+                    math.max(objectSize.Y * scaleFactor, 10)  -- Minimum size of 10
+                );
+                
+                -- Use custom box size if provided, otherwise use calculated size
+                local boxSize = cache.options.boxSize or calculatedBoxSize;
                 local boxPosition = round(vector2New(screenPosition.X - (boxSize.X * 0.5), screenPosition.Y - (boxSize.Y * 0.5)));
                 
                 -- Main box
