@@ -287,29 +287,7 @@ local espLibrary = {
         local oMin, oMax = vector3New(minX, minY, minZ), vector3New(maxX, maxY, maxZ);
         return (oMax + oMin) * 0.5, oMax - oMin;
     else
-        -- Handle both character/torso and model cases
-        if torso and torso.Position then
-            return torso.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
-        elseif character and character.PrimaryPart and character.PrimaryPart.Position then
-            return character.PrimaryPart.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
-        else
-            -- Fallback for models without PrimaryPart
-            local modelPosition = vector3New(0, 0, 0);
-            local partCount = 0;
-            
-            for _, part in next, getChildren(character) do
-                if (isA(part, "BasePart")) then
-                    modelPosition = modelPosition + part.Position;
-                    partCount = partCount + 1;
-                end
-            end
-            
-            if partCount > 0 then
-                modelPosition = modelPosition / partCount;
-            end
-            
-            return modelPosition, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
-        end
+        return torso.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
     end
   end
   
@@ -513,9 +491,6 @@ local espLibrary = {
         boxFill = create("Square", {
             Thickness = 1,
             Filled = true
-        }),
-        chams = create("Highlight", {
-            Parent = screenGui,
         })
     };
   end
@@ -529,9 +504,6 @@ local espLibrary = {
         cache.box:Remove();
         cache.boxOutline:Remove();
         cache.boxFill:Remove();
-        if cache.chams then
-            cache.chams:Destroy();
-        end
     end
     
     -- Clean up object-specific connections
@@ -566,11 +538,6 @@ local espLibrary = {
     options.boxTransparency = options.boxTransparency or 1;
     options.boxFillColor = options.boxFillColor or color3New(1, 1, 1);
     options.boxFillTransparency = options.boxFillTransparency or 0.5;
-    options.showChams = options.showChams or false;
-    options.chamsFillColor = options.chamsFillColor or color3New(1, 0, 0);
-    options.chamsFillTransparency = options.chamsFillTransparency or 0.5;
-    options.chamsOutlineColor = options.chamsOutlineColor or color3New(0, 0, 0);
-    options.chamsOutlineTransparency = options.chamsOutlineTransparency or 0;
     
     -- Box size logic: if not using boxes, require boxSize argument
     if not options.showBox then
@@ -906,39 +873,7 @@ local espLibrary = {
                 partPosition = object.Position;
                 objectSize = object.Size;
             elseif (object:IsA("Model")) then
-                -- Safe call to getBoundingBox with error handling
-                local success, result1, result2 = pcall(function()
-                    return self.getBoundingBox(object);
-                end)
-                
-                if success and result1 and result2 then
-                    partPosition, objectSize = result1, result2;
-                else
-                    -- Fallback: try to get PrimaryPart or calculate average position
-                    if object.PrimaryPart then
-                        partPosition = object.PrimaryPart.Position;
-                        objectSize = object.PrimaryPart.Size;
-                    else
-                        -- Calculate average position of all parts
-                        local totalPosition = vector3New(0, 0, 0);
-                        local partCount = 0;
-                        
-                        for _, part in next, object:GetChildren() do
-                            if part:IsA("BasePart") then
-                                totalPosition = totalPosition + part.Position;
-                                partCount = partCount + 1;
-                            end
-                        end
-                        
-                        if partCount > 0 then
-                            partPosition = totalPosition / partCount;
-                            objectSize = vector3New(4, 4, 4); -- Default size
-                        else
-                            -- Skip this object if we can't get position
-                            continue;
-                        end
-                    end
-                end
+                partPosition, objectSize = self.getBoundingBox(object);
             end
   
             local distance = (currentCamera.CFrame.Position - partPosition).Magnitude;
@@ -999,19 +934,6 @@ local espLibrary = {
                 cache.box.Visible = false;
                 cache.boxOutline.Visible = false;
                 cache.boxFill.Visible = false;
-            end
-            
-            -- Chams ESP
-            if cache.options.showChams and canShow then
-                cache.chams.Enabled = true;
-                cache.chams.DepthMode = cache.options.visibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
-                cache.chams.Adornee = object;
-                cache.chams.FillColor = cache.options.chamsFillColor;
-                cache.chams.FillTransparency = cache.options.chamsFillTransparency;
-                cache.chams.OutlineColor = cache.options.chamsOutlineColor;
-                cache.chams.OutlineTransparency = cache.options.chamsOutlineTransparency;
-            else
-                cache.chams.Enabled = false;
             end
         end
     end);
