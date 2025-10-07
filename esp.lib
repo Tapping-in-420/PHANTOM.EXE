@@ -4,8 +4,8 @@ local espLibrary = {
     chamsCache = {},
     objectCache = {},
     conns = {},
-    whitelist = {}, -- insert string that is the player's name you want to whitelist (turns esp color to whitelistColor in options)
-    blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
+    whitelist = {}, 
+    blacklist = {}, 
     options = {
         enabled = true,
         minScaleFactorX = 1,
@@ -26,10 +26,6 @@ local espLibrary = {
         teamColor = false,
         useCustomTeamColor = false,
         customteamColor = Color3.new(1,1,1),
-        attackerColor = false,
-        attackerColorValue = Color3.new(1, 0, 0),
-        defenderColor = false,
-        defenderColorValue = Color3.new(0, 1, 0),
         fillColor = nil,
         whitelistColor = Color3.new(1, 0, 0),
         outOfViewArrows = true,
@@ -157,60 +153,63 @@ local espLibrary = {
     return typeof(number) == "Vector2" and vector2New(round(number.X), round(number.Y)) or floor(number);
   end
   
+  if game.GameId == 13559584718 then 
+    local teamModule = require(game:GetService("ReplicatedStorage").Modules.Client.UI.Team)
+  end
+
+  local function GetLoneTeam()
+    local teammates = {}
+    if teamModule.MyTeam and teamModule.MyTeam.Players then
+        for _, player in pairs(teamModule.MyTeam.Players) do
+            if player.Id ~= game.Players.LocalPlayer.UserId then
+                table.insert(teammates, player.Name)
+            end
+        end
+    end
+    return teammates
+  end
+
   -- Main Functions
   function espLibrary.getTeam(player)
-    local playerName = player.Name
-    local teamName = "none"
-    local teamColor = Color3.new(1, 1, 1) -- Default white
-    
-    -- Check if player is in attackers team
-    if workspace.teams.attackers then
-        for _, child in pairs(workspace.teams.attackers:GetChildren()) do
-            if child.Name == playerName then
-                teamName = "attackers"
-                teamColor = Color3.new(1, 0, 0) -- Default red for attackers
-                
-                -- Use custom attacker color if enabled
-                if espLibrary.options.attackerColor then
-                    teamColor = espLibrary.options.attackerColorValue
+    local team = player.Team;
+
+    if game.GameId == 13559584718 then --> lone survival
+        return GetLoneTeam()
+    elseif game.GameId == 7935634976 then --> the lost front
+        local teamPath = game.workspace.teams
+        
+        for _, teamModule in pairs(teamPath:GetChildren()) do
+            if teamModule:FindFirstChild(player.Name) then
+                if teamModule.Name == "attackers" then
+                    return teamModule.Name, Color3.fromRGB(255, 0, 0) -- Red
+                elseif teamModule.Name == "defenders" then
+                    return teamModule.Name, Color3.fromRGB(0, 0, 255) -- Blue
+                else
+                    return teamModule.Name
                 end
-                break
             end
         end
+    else
+        local team = player.Team
+        return team, player.TeamColor.Color
     end
-    
-    -- Check if player is in defenders team (only if not found in attackers)
-    if teamName == "none" and workspace.teams.defenders then
-        for _, child in pairs(workspace.teams.defenders:GetChildren()) do
-            if child.Name == playerName then
-                teamName = "defenders"
-                teamColor = Color3.new(0, 1, 0) -- Default green for defenders
-                
-                -- Use custom defender color if enabled
-                if espLibrary.options.defenderColor then
-                    teamColor = espLibrary.options.defenderColorValue
-                end
-                break
-            end
-        end
-    end
-    
-    return teamName, teamColor
   end
   
   function espLibrary.getCharacter(player)
-    local character = player.Character
+    local character = nil
+
+    if game.GameId == 13559584718 then
+        character = workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild(player.Name)
+    else
+        character = game.Players:FindFirstChild(player.Name).Character
+    end
+
     if not character then return nil, nil end
     
-    -- Try to find HumanoidRootPart first
     local torso = character:FindFirstChild("HumanoidRootPart")
-    
-    -- If no HumanoidRootPart, try UpperTorso (for R15 rigs)
     if not torso then
         torso = character:FindFirstChild("UpperTorso")
     end
-    
-    -- If still no torso found, try Torso (for R6 rigs)
     if not torso then
         torso = character:FindFirstChild("Torso")
     end
@@ -219,43 +218,68 @@ local espLibrary = {
   end
 
   function espLibrary.getTool(player)
-    local playerName = player.Name
-    
-    -- Check if player is in attackers team
-    if workspace.teams.attackers then
-        local playerFolder = workspace.teams.attackers:FindFirstChild(playerName)
-        if playerFolder then
-            local itemFolder = playerFolder:FindFirstChild("ItemFolder")
-            if itemFolder then
-                
-                -- Get the first weapon in the ItemFolder
-                for _, weapon in pairs(itemFolder:GetChildren()) do
-                    if weapon:IsA("Model") or weapon:IsA("Folder") then
-                        return weapon.Name
+    if game.GameId == 13559584718 then --> lone survival
+        local character = players:FindFirstChild(player.Name);
+        if not character then return "None" end
+        
+        local worldmodel = character:FindFirstChild("Worldmodel")
+        if not worldmodel then return "None" end
+        
+        local replicatedStorage = getService(game, "ReplicatedStorage")
+        local toolsFolder = replicatedStorage:FindFirstChild("Assets")
+        if toolsFolder then
+            toolsFolder = toolsFolder:FindFirstChild("Prefabs")
+            if toolsFolder then
+                toolsFolder = toolsFolder:FindFirstChild("Tools")
+            end
+        end
+        
+        if not toolsFolder then return "None" end
+        
+        local playerObjects = {}
+        for _, obj in pairs(worldmodel:GetChildren()) do
+            if obj:IsA("BasePart") or obj:IsA("MeshPart") or obj:IsA("UnionOperation") or obj:IsA("Part") then
+                playerObjects[obj.Name] = obj
+            end
+        end
+        
+        for _, toolFolder in pairs(toolsFolder:GetChildren()) do
+            if toolFolder:IsA("Folder") then
+                local toolWorldmodel = toolFolder:FindFirstChild("Worldmodel")
+                if toolWorldmodel then
+                    local matches = 0
+                    local totalObjects = 0
+                    
+                    for _, obj in pairs(toolWorldmodel:GetChildren()) do
+                        if obj:IsA("BasePart") or obj:IsA("MeshPart") or obj:IsA("UnionOperation") or obj:IsA("Part") then
+                            totalObjects = totalObjects + 1
+                            if playerObjects[obj.Name] then
+                                matches = matches + 1
+                            end
+                        end
+                    end
+                    
+                    if totalObjects > 0 and matches >= totalObjects * 0.8 then
+                        return toolFolder.Name
                     end
                 end
             end
         end
-    end
-    
-    -- Check if player is in defenders team
-    if workspace.teams.defenders then
-        local playerFolder = workspace.teams.defenders:FindFirstChild(playerName)
-        if playerFolder then
-            local itemFolder = playerFolder:FindFirstChild("ItemFolder")
-            if itemFolder then
-              
-                -- Get the first weapon in the ItemFolder
-                for _, weapon in pairs(itemFolder:GetChildren()) do
-                    if weapon:IsA("Model") or weapon:IsA("Folder") then
-                        return weapon.Name
-                    end
-                end
-            end
+        return "None"
+    elseif game.GameId == 7935634976 then --> the lost front
+        local character = player.Character
+        if not character then return "None" end
+        
+        local itemFolder = character:FindFirstChild("ItemFolder")
+        if not itemFolder then return "None" end
+        
+        local toolModel = itemFolder:FindFirstChildOfClass("Model")
+        if toolModel then
+            return toolModel.Name
         end
+        
+        return "None"
     end
-    
-    return "None"
   end
   
   function espLibrary.getBoundingBox(character, torso)
@@ -411,13 +435,11 @@ local espLibrary = {
   
     espLibrary.espCache[player] = objects;
 
-    -- Add death check connection
-    local character = player.Character
+    local character = players:FindFirstChild(player.Name)
     if character then
         local humanoid = character:FindFirstChild("Humanoid")
         if humanoid then
             humanoid.Died:Connect(function()
-                -- Remove ESP when player dies
                 for _, object in next, objects do
                     object.Visible = false
                 end
@@ -425,16 +447,16 @@ local espLibrary = {
         end
     end
 
-    -- Connect to CharacterAdded to handle respawns
-    player.CharacterAdded:Connect(function(char)
-        local humanoid = char:WaitForChild("Humanoid", 5)
-        if humanoid then
-            humanoid.Died:Connect(function()
-                -- Remove ESP when player dies
-                for _, object in next, objects do
-                    object.Visible = false
-                end
-            end)
+    players.ChildAdded:Connect(function(char)
+        if char.Name == player.Name then
+            local humanoid = char:WaitForChild("Humanoid", 5)
+            if humanoid then
+                humanoid.Died:Connect(function()
+                    for _, object in next, objects do
+                        object.Visible = false
+                    end
+                end)
+            end
         end
     end)
   end
@@ -472,27 +494,35 @@ local espLibrary = {
   end
   
   function espLibrary.addObject(object, options)
-    espLibrary.objectCache[object] = {
+    local cache = {
         options = options,
-        text = create("Text", {
+        text = nil,
+        box = nil
+    };
+    
+    -- Create text object if needed
+    if options.espType == "text" or options.espType == "both" then
+        cache.text = create("Text", {
             Center = true,
             Size = 13,
             Outline = true,
             OutlineColor = color3New(),
             Font = 2,
-        }),
-        box = create("Square", {
-            Thickness = 1
-        }),
-        boxOutline = create("Square", {
-            Thickness = 1,
-            Color = color3New()
-        }),
-        boxFill = create("Square", {
-            Thickness = 1,
-            Filled = true
-        })
-    };
+        });
+    end
+    
+    -- Create box object if needed
+    if options.espType == "box" or options.espType == "both" then
+        cache.box = create("Square", {
+            Size = options.boxSize,
+            Filled = options.boxFilled,
+            Thickness = options.boxThickness,
+            Color = options.color,
+            Transparency = options.transparency,
+        });
+    end
+    
+    espLibrary.objectCache[object] = cache;
   end
   
   function espLibrary.removeObject(object)
@@ -500,28 +530,41 @@ local espLibrary = {
   
     if (cache) then
         espLibrary.objectCache[object] = nil;
-        cache.text:Remove();
-        cache.box:Remove();
-        cache.boxOutline:Remove();
-        cache.boxFill:Remove();
-    end
-    
-    -- Clean up object-specific connections
-    if espLibrary.objectConnections and espLibrary.objectConnections[object] then
-        local connections = espLibrary.objectConnections[object];
-        for _, conn in pairs(connections) do
-            if conn and conn.Connected then
-                conn:Disconnect();
-            end
+        
+        -- Properly clean up the text object to prevent ghost visuals
+        if cache.text then
+            cache.text.Visible = false;
+            cache.text:Remove();
         end
-        espLibrary.objectConnections[object] = nil;
+        
+        -- Properly clean up the box object to prevent ghost visuals
+        if cache.box then
+            cache.box.Visible = false;
+            cache.box:Remove();
+        end
     end
   end
   
-  function espLibrary:AddObjectEsp(object, defaultOptions, boxSize)
+  function espLibrary:AddObjectEsp(object, defaultOptions, BoxSize)
     assert(object and object.Parent, "invalid object passed");
   
     local options = defaultOptions or {};
+    
+    -- Handle Model objects by finding PrimaryPart or suitable child
+    local targetObject = object;
+    if object:IsA("Model") then
+        if object.PrimaryPart then
+            targetObject = object.PrimaryPart;
+        else
+            -- Find the first BasePart child
+            for _, child in next, object:GetChildren() do
+                if child:IsA("BasePart") then
+                    targetObject = child;
+                    break;
+                end
+            end
+        end
+    end
   
     options.enabled = options.enabled or true;
     options.limitDistance = options.limitDistance or false;
@@ -532,59 +575,33 @@ local espLibrary = {
     options.text = options.text or object.Name;
     options.font = options.font or 2;
     options.fontSize = options.fontSize or 13;
-    options.showBox = options.showBox or false;
-    options.showBoxFill = options.showBoxFill or false;
-    options.boxColor = options.boxColor or color3New(1, 1, 1);
-    options.boxTransparency = options.boxTransparency or 1;
-    options.boxFillColor = options.boxFillColor or color3New(1, 1, 1);
-    options.boxFillTransparency = options.boxFillTransparency or 0.5;
     
-    -- Box size logic: if not using boxes, require boxSize argument
-    if not options.showBox then
-        assert(boxSize, "boxSize argument is required when showBox is false");
-        options.boxSize = boxSize;
-    else
-        -- If using boxes, use provided boxSize or calculate from object
-        options.boxSize = boxSize or options.boxSize;
-    end
+    -- ESP type options
+    options.espType = options.espType or "text"; -- "text", "box", or "both"
+    options.boxSize = BoxSize or options.boxSize or vector2New(50, 50);
+    options.boxFilled = options.boxFilled or false;
+    options.boxThickness = options.boxThickness or 2;
+    
+    -- Store the original object for reference but use targetObject for positioning
+    options.originalObject = object;
+    options.targetObject = targetObject;
   
     self.addObject(object, options);
   
-    -- Multiple cleanup connections for better reliability
-    local connections = {};
+    -- Monitor both the original object and targetObject for removal
+    insert(self.conns, object.Parent.ChildRemoved:Connect(function(child)
+        if (child == object) then
+            self.removeObject(child);
+        end
+    end));
     
-    -- Connection 1: Parent ChildRemoved
-    if object.Parent then
-        connections.parentRemoved = object.Parent.ChildRemoved:Connect(function(child)
-            if (child == object) then
+    -- Also monitor the targetObject if it's different from the original object
+    if targetObject ~= object and targetObject.Parent then
+        insert(self.conns, targetObject.Parent.ChildRemoved:Connect(function(child)
+            if (child == targetObject) then
                 self.removeObject(object);
             end
-        end);
-    end
-    
-    -- Connection 2: Object AncestryChanged (for when object is moved/deleted)
-    connections.ancestryChanged = object.AncestryChanged:Connect(function()
-        if not object.Parent then
-            self.removeObject(object);
-        end
-    end);
-    
-    -- Connection 3: Object Destroying
-    if object:IsA("Instance") then
-        connections.destroying = object.Destroying:Connect(function()
-            self.removeObject(object);
-        end);
-    end
-    
-    -- Store connections for cleanup
-    if not self.objectConnections then
-        self.objectConnections = {};
-    end
-    self.objectConnections[object] = connections;
-    
-    -- Add to main connections list for global cleanup
-    for _, conn in pairs(connections) do
-        insert(self.conns, conn);
+        end));
     end
   
     return options;
@@ -602,18 +619,6 @@ local espLibrary = {
   
     for object, _ in next, self.objectCache do
         self.removeObject(object);
-    end
-  
-    -- Clean up object connections
-    if self.objectConnections then
-        for object, connections in next, self.objectConnections do
-            for _, conn in pairs(connections) do
-                if conn and conn.Connected then
-                    conn:Disconnect();
-                end
-            end
-        end
-        self.objectConnections = {};
     end
   
     for _, object in next, self.instances do
@@ -640,6 +645,22 @@ local espLibrary = {
         self.addChams(player);
     end
   
+    -- Add periodic cleanup task for more thorough cleanup
+    insert(self.conns, task.spawn(function()
+        while true do
+            task.wait(2) -- Check every 2 seconds
+            for object, cache in next, self.objectCache do
+                if not object or not object.Parent then
+                    self.removeObject(object);
+                elseif cache.options.targetObject and cache.options.targetObject ~= object then
+                    if not cache.options.targetObject.Parent then
+                        self.removeObject(object);
+                    end
+                end
+            end
+        end
+    end));
+
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
             local character, torso = self.getCharacter(player);
@@ -860,20 +881,28 @@ local espLibrary = {
         end
   
         for object, cache in next, self.objectCache do
-            -- Safety check: remove objects that no longer exist
-            if not object or not object.Parent then
+            if not object or not cache or (not cache.text and not cache.box) then
+                self.removeObject(object);
+                continue;
+            end
+            
+            -- Check if the original object or target object still exists
+            local targetObject = cache.options.targetObject or object;
+            if not object.Parent or (targetObject ~= object and not targetObject.Parent) then
+                -- Object no longer exists, remove ESP
                 self.removeObject(object);
                 continue;
             end
             
             local partPosition = vector3New();
-            local objectSize = vector3New();
   
-            if (object:IsA("BasePart")) then
-                partPosition = object.Position;
-                objectSize = object.Size;
+            if (targetObject:IsA("BasePart")) then
+                partPosition = targetObject.Position;
             elseif (object:IsA("Model")) then
-                partPosition, objectSize = self.getBoundingBox(object);
+                partPosition = self.getBoundingBox(object);
+            else
+                self.removeObject(object);
+                continue;
             end
   
             local distance = (currentCamera.CFrame.Position - partPosition).Magnitude;
@@ -888,52 +917,26 @@ local espLibrary = {
                 canShow = false;
             end
   
-            -- Text ESP
-            cache.text.Visible = canShow;
-            cache.text.Font = cache.options.font;
-            cache.text.Size = cache.options.fontSize;
-            cache.text.Transparency = cache.options.transparency;
-            cache.text.Color = cache.options.color;
-            cache.text.Text = cache.options.text;
-            cache.text.Position = round(screenPosition);
+            -- Update text object if it exists
+            if cache.text then
+                cache.text.Visible = canShow;
+                cache.text.Font = cache.options.font;
+                cache.text.Size = cache.options.fontSize;
+                cache.text.Transparency = cache.options.transparency;
+                cache.text.Color = cache.options.color;
+                cache.text.Text = cache.options.text;
+                cache.text.Position = round(screenPosition);
+            end
             
-            -- Box ESP
-            if cache.options.showBox and canShow then
-                -- Calculate box size based on object's actual size
-                local scaleFactor = self.getScaleFactor(currentCamera.FieldOfView, (currentCamera.CFrame.Position - partPosition).Magnitude);
-                local calculatedBoxSize = vector2New(
-                    math.max(objectSize.X * scaleFactor, 10), -- Minimum size of 10
-                    math.max(objectSize.Y * scaleFactor, 10)  -- Minimum size of 10
-                );
-                
-                -- Use custom box size if provided, otherwise use calculated size
-                local boxSize = cache.options.boxSize or calculatedBoxSize;
-                local boxPosition = round(vector2New(screenPosition.X - (boxSize.X * 0.5), screenPosition.Y - (boxSize.Y * 0.5)));
-                
-                -- Main box
-                cache.box.Visible = true;
-                cache.box.Color = cache.options.boxColor;
-                cache.box.Transparency = cache.options.boxTransparency;
-                cache.box.Size = boxSize;
-                cache.box.Position = boxPosition;
-                
-                -- Box outline
-                cache.boxOutline.Visible = true;
-                cache.boxOutline.Color = cache.options.boxColor;
-                cache.boxOutline.Transparency = cache.options.boxTransparency;
-                cache.boxOutline.Size = boxSize;
-                cache.boxOutline.Position = boxPosition;
-                
-                -- Box fill
-                cache.boxFill.Visible = cache.options.showBoxFill;
-                cache.boxFill.Color = cache.options.boxFillColor;
-                cache.boxFill.Transparency = cache.options.boxFillTransparency;
-                cache.boxFill.Size = boxSize;
-                cache.boxFill.Position = boxPosition;
-            else
-                cache.box.Visible = false;
-                cache.boxOutline.Visible = false;
-                cache.boxFill.Visible = false;
+            -- Update box object if it exists
+            if cache.box then
+                cache.box.Visible = canShow;
+                cache.box.Color = cache.options.color;
+                cache.box.Transparency = cache.options.transparency;
+                cache.box.Size = cache.options.boxSize;
+                cache.box.Filled = cache.options.boxFilled;
+                cache.box.Thickness = cache.options.boxThickness;
+                cache.box.Position = round(screenPosition - cache.options.boxSize / 2);
             end
         end
     end);
