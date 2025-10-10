@@ -161,7 +161,7 @@ local espLibrary = {
     local teammates = {}
     if teamModule.MyTeam and teamModule.MyTeam.Players then
         for _, player in pairs(teamModule.MyTeam.Players) do
-            if player.Id ~= game.Players.LocalPlayer.UserId then
+            if player.Id ~= game:GetService("Players").LocalPlayer.UserId then
                 table.insert(teammates, player.Name)
             end
         end
@@ -169,7 +169,6 @@ local espLibrary = {
     return teammates
   end
 
-  -- Main Functions
   function espLibrary.getTeam(player)
     local team = player.Team;
 
@@ -189,6 +188,26 @@ local espLibrary = {
                 end
             end
         end
+    elseif game.GameId == 6035872082 then --> rivals
+        local myTeamID = game:GetService("Players").LocalPlayer:GetAttribute("TeamID")
+        local theirTeamID = player:GetAttribute("TeamID")
+        
+        if theirTeamID == myTeamID then
+            return "teammate", Color3.fromRGB(0, 255, 0) -- Green for teammates
+        else
+            return "enemy", Color3.fromRGB(255, 0, 0) -- Red for enemies
+        end
+    elseif game.PlaceId == 13559584718 then --> Hypershot
+        local myTeam = game:GetService("Players").LocalPlayer:GetAttribute("Team")
+        local theirTeam = player:GetAttribute("Team")
+        
+        if myTeam == -1 or theirTeam == -1 then
+            return "ffa", Color3.fromRGB(255, 255, 255) -- White for FFA
+        elseif myTeam == theirTeam then
+            return "teammate", Color3.fromRGB(0, 255, 0) -- Green for teammates
+        else
+            return "enemy", Color3.fromRGB(255, 0, 0) -- Red for enemies
+        end
     else
         local team = player.Team
         return team, player.TeamColor.Color
@@ -200,8 +219,24 @@ local espLibrary = {
 
     if game.GameId == 13559584718 then
         character = workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild(player.Name)
+    elseif game.PlaceId == 13559584718 then -- Hypershot
+        -- Try multiple locations for Hypershot characters
+        character = player.Character
+        if not character then
+            -- Check workspace directly for player models
+            character = workspace:FindFirstChild(player.Name)
+        end
+        if not character then
+            -- Check if there's a GlobalStuff module to get character
+            local success, result = pcall(function()
+                return require(game.ReplicatedStorage.Modules.GlobalStuff):GetCharacter(player)
+            end)
+            if success and result then
+                character = result
+            end
+        end
     else
-        character = game.Players:FindFirstChild(player.Name).Character
+        character = game:GetService("Players"):FindFirstChild(player.Name).Character
     end
 
     if not character then return nil, nil end
@@ -276,6 +311,28 @@ local espLibrary = {
         local toolModel = itemFolder:FindFirstChildOfClass("Model")
         if toolModel then
             return toolModel.Name
+        end
+        
+        return "None"
+    elseif game.PlaceId == 13559584718 then --> Hypershot
+        local character = player.Character
+        if not character then return "None" end
+        
+        -- Check for tools in character
+        for _, child in pairs(character:GetChildren()) do
+            if child:IsA("Tool") then
+                return child.Name
+            end
+        end
+        
+        -- Check for tools in Backpack
+        local backpack = player:FindFirstChild("Backpack")
+        if backpack then
+            for _, tool in pairs(backpack:GetChildren()) do
+                if tool:IsA("Tool") then
+                    return tool.Name
+                end
+            end
         end
         
         return "None"
