@@ -236,7 +236,10 @@ local espLibrary = {
             end
         end
     else
-        character = game:GetService("Players"):FindFirstChild(player.Name).Character
+        character = player.Character
+        if not character then
+            character = game:GetService("Players"):FindFirstChild(player.Name) and game:GetService("Players"):FindFirstChild(player.Name).Character
+        end
     end
 
     if not character then return nil, nil end
@@ -315,7 +318,7 @@ local espLibrary = {
         
         return "None"
     elseif game.PlaceId == 13559584718 then --> Hypershot
-        local character = player.Character
+        local character = espLibrary.getCharacter(player)
         if not character then return "None" end
         
         -- Check for tools in character
