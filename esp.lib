@@ -74,11 +74,19 @@ local espLibrary = {
         skeleton = false,
         skeletonColor = Color3.new(1, 1, 1),
         skeletonTransparency = 1,
+        viewline = false,
+        viewlineColor = Color3.new(1, 1, 1),
+        viewlineTransparency = 1,
+        viewlineLength = 4,
+        kdText = false,
+        kdTextColor = Color3.new(1, 1, 1),
+        kdTextTransparency = 1,
+        cheaterText = false,
+        cheatColor = Color3.new(1, 0, 0),
     },
   };
   espLibrary.__index = espLibrary;
   
-  -- variables
   local getService = game.GetService;
   local instanceNew = Instance.new;
   local drawingNew = Drawing.new;
@@ -106,23 +114,19 @@ local espLibrary = {
   local cross = vector3New().Cross;
   local inf = 1 / 0;
   
-  -- services
   local workspace = getService(game, "Workspace");
   local runService = getService(game, "RunService");
   local players = getService(game, "Players");
   local coreGui = getService(game, "CoreGui");
   local userInputService = getService(game, "UserInputService");
   
-  -- cache
   local currentCamera = workspace.CurrentCamera;
   local localPlayer = players.LocalPlayer;
   local screenGui = instanceNew("ScreenGui", coreGui);
   local lastFov, lastScale;
   
-  -- instance functions
   local wtvp = currentCamera.WorldToViewportPoint;
   
-  -- Support Functions
   local function isDrawing(type)
     return type == "Square" or type == "Text" or type == "Triangle" or type == "Image" or type == "Line" or type == "Circle";
   end
@@ -143,6 +147,25 @@ local espLibrary = {
   
     return object;
   end
+
+  local function getAssetThumbnail(assetId)
+    local success, response = pcall(function()
+        return game:HttpGet("https://thumbnails.roblox.com/v1/assets?assetIds=" .. assetId .. "&size=420x420&format=Png&isCircular=false");
+    end);
+    
+    if success and response then
+        local httpService = getService(game, "HttpService");
+        local decodeSuccess, data = pcall(function()
+            return httpService:JSONDecode(response);
+        end);
+        
+        if decodeSuccess and data and data.data and data.data[1] and data.data[1].imageUrl then
+            return data.data[1].imageUrl;
+        end
+    end
+    
+    return nil;
+end
   
   local function worldToViewportPoint(position)
     local screenPosition, onScreen = wtvp(currentCamera, position);
@@ -180,9 +203,9 @@ local espLibrary = {
         for _, teamModule in pairs(teamPath:GetChildren()) do
             if teamModule:FindFirstChild(player.Name) then
                 if teamModule.Name == "attackers" then
-                    return teamModule.Name, Color3.fromRGB(255, 0, 0) -- Red
+                    return teamModule.Name, Color3.fromRGB(255, 0, 0) 
                 elseif teamModule.Name == "defenders" then
-                    return teamModule.Name, Color3.fromRGB(0, 0, 255) -- Blue
+                    return teamModule.Name, Color3.fromRGB(0, 0, 255) 
                 else
                     return teamModule.Name
                 end
@@ -193,20 +216,46 @@ local espLibrary = {
         local theirTeamID = player:GetAttribute("TeamID")
         
         if theirTeamID == myTeamID then
-            return "teammate", Color3.fromRGB(0, 255, 0) -- Green for teammates
+            return "teammate", Color3.fromRGB(0, 255, 0)
         else
-            return "enemy", Color3.fromRGB(255, 0, 0) -- Red for enemies
+            return "enemy", Color3.fromRGB(255, 0, 0)
         end
-    elseif game.PlaceId == 13559584718 then --> Hypershot
-        local myTeam = game:GetService("Players").LocalPlayer:GetAttribute("Team")
-        local theirTeam = player:GetAttribute("Team")
+    elseif game.GameId == 2862098693 then --> project delta
+        local clanData = game:GetService("ReplicatedStorage"):FindFirstChild("ClanData")
+        local clansFolder = game:GetService("ReplicatedStorage"):FindFirstChild("Clans")
         
-        if myTeam == -1 or theirTeam == -1 then
-            return "ffa", Color3.fromRGB(255, 255, 255) -- White for FFA
-        elseif myTeam == theirTeam then
-            return "teammate", Color3.fromRGB(0, 255, 0) -- Green for teammates
+        if not clanData or not clansFolder then
+            return "unknown", Color3.fromRGB(128, 128, 128)
+        end
+        
+        local currentClan = clanData:GetAttribute("CurrentClan")
+        if not currentClan then
+            return "no_clan", Color3.fromRGB(128, 128, 128)
+        end
+        
+        local clan = clansFolder:FindFirstChild(currentClan)
+        if not clan then
+            return "no_clan", Color3.fromRGB(128, 128, 128)
+        end
+        
+        local owner = clan:GetAttribute("Owner")
+        local isTeammate = false
+        
+        if owner == player.Name then
+            isTeammate = true
         else
-            return "enemy", Color3.fromRGB(255, 0, 0) -- Red for enemies
+            for _, member in pairs(clan:GetChildren()) do
+                if member.Name == player.Name then
+                    isTeammate = true
+                    break
+                end
+            end
+        end
+        
+        if isTeammate then
+            return "teammate", Color3.fromRGB(0, 255, 0) 
+        else
+            return "enemy", Color3.fromRGB(255, 0, 0) 
         end
     else
         local team = player.Team
@@ -219,27 +268,12 @@ local espLibrary = {
 
     if game.GameId == 13559584718 then
         character = workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild(player.Name)
-    elseif game.PlaceId == 13559584718 then -- Hypershot
-        -- Try multiple locations for Hypershot characters
-        character = player.Character
-        if not character then
-            -- Check workspace directly for player models
-            character = workspace:FindFirstChild(player.Name)
-        end
-        if not character then
-            -- Check if there's a GlobalStuff module to get character
-            local success, result = pcall(function()
-                return require(game.ReplicatedStorage.Modules.GlobalStuff):GetCharacter(player)
-            end)
-            if success and result then
-                character = result
-            end
-        end
+    elseif game.GameId == 5995470825 then
+        character = workspace:FindFirstChild(player.Name)
+    elseif game.GameId == 807930589 then
+        character = workspace:FindFirstChild("WORKSPACE_Entities") and workspace.WORKSPACE_Entities:FindFirstChild("Players") and workspace.WORKSPACE_Entities.Players:FindFirstChild(player.Name)
     else
-        character = player.Character
-        if not character then
-            character = game:GetService("Players"):FindFirstChild(player.Name) and game:GetService("Players"):FindFirstChild(player.Name).Character
-        end
+        character = game:GetService("Players"):FindFirstChild(player.Name).Character
     end
 
     if not character then return nil, nil end
@@ -253,6 +287,39 @@ local espLibrary = {
     end
     
     return character, torso
+  end
+
+  function espLibrary.getKD(player)
+    if game.GameId == 2862098693 then --> project delta
+        local replicatedStorage = getService(game, "ReplicatedStorage")
+        local playersFolder = replicatedStorage:FindFirstChild("Players")
+        
+        if not playersFolder then return "0.0 KD", 0 end
+        
+        local playerFolder = playersFolder:FindFirstChild(player.Name)
+        if not playerFolder then return "0.0 KD", 0 end
+        
+        local status = playerFolder:FindFirstChild("Status")
+        if not status then return "0.0 KD", 0 end
+        
+        local journey = status:FindFirstChild("Journey")
+        if not journey then return "0.0 KD", 0 end
+        
+        local statistics = journey:FindFirstChild("Statistics")
+        if not statistics then return "0.0 KD", 0 end
+        
+        local kills = statistics:GetAttribute("Kills") or 0
+        local deaths = statistics:GetAttribute("Deaths") or 0
+        
+        if deaths == 0 then
+            return tostring(kills) .. ".0 KD", kills
+        end
+        
+        local kd = kills / deaths
+        return string.format("%.1f KD", kd), kd
+    end
+    
+    return "0.0 KD", 0
   end
 
   function espLibrary.getTool(player)
@@ -317,24 +384,35 @@ local espLibrary = {
         end
         
         return "None"
-    elseif game.PlaceId == 13559584718 then --> Hypershot
-        local character = espLibrary.getCharacter(player)
+    elseif game.GameId == 2862098693 then --> project delta
+        local character = player.Character
         if not character then return "None" end
         
-        -- Check for tools in character
         for _, child in pairs(character:GetChildren()) do
-            if child:IsA("Tool") then
+            if child:IsA("Model") and child:FindFirstChild("ItemRoot") then
                 return child.Name
             end
         end
         
-        -- Check for tools in Backpack
-        local backpack = player:FindFirstChild("Backpack")
-        if backpack then
-            for _, tool in pairs(backpack:GetChildren()) do
-                if tool:IsA("Tool") then
-                    return tool.Name
-                end
+        return "None"
+    elseif game.GameId == 5995470825 then
+        local character, torso = espLibrary.getCharacter(player)
+        if not character then return "None" end
+        
+        for _, child in pairs(character:GetChildren()) do
+            if child:IsA("Model") then
+                return child.Name
+            end
+        end
+        
+        return "None"
+    elseif game.GameId == 807930589 then --> wild west
+        local character, torso = espLibrary.getCharacter(player)
+        if not character then return "None" end
+        
+        for _, child in pairs(character:GetChildren()) do
+            if child:IsA("Model") and not string.find(child.Name, "LoadoutItem/") and not string.find(child.Name, "Holster") then
+                return child.Name
             end
         end
         
@@ -478,19 +556,34 @@ local espLibrary = {
         lineoutline = create("Line", {Thickness = 3}),
         line = create("Line", {Thickness = 1}),
         
-        -- Add skeleton line objects
         skeletonHead = create("Line", {Thickness = 1}),
         skeletonTorso = create("Line", {Thickness = 1}),
         skeletonLeftArm = create("Line", {Thickness = 1}),
         skeletonRightArm = create("Line", {Thickness = 1}),
         skeletonLeftLeg = create("Line", {Thickness = 1}),
         skeletonRightLeg = create("Line", {Thickness = 1}),
-        -- For R15 additional connections
+
         skeletonUpperTorso = create("Line", {Thickness = 1}),
         skeletonLeftUpperArm = create("Line", {Thickness = 1}),
         skeletonRightUpperArm = create("Line", {Thickness = 1}),
         skeletonLeftUpperLeg = create("Line", {Thickness = 1}),
         skeletonRightUpperLeg = create("Line", {Thickness = 1}),
+
+        viewline = create("Line", {Thickness = 2}),
+        kdText = create("Text", {
+            Center = true,
+            Size = 13,
+            Outline = true,
+            OutlineColor = color3New(),
+            Font = 2,
+        }),
+        cheaterText = create("Text", {
+            Center = true,
+            Size = 13,
+            Outline = true,
+            OutlineColor = color3New(),
+            Font = 2,
+        }),
     };
   
     espLibrary.espCache[player] = objects;
@@ -553,14 +646,47 @@ local espLibrary = {
     end
   end
   
+  local function loadImageAsync(cache, imageUrl)
+    task.spawn(function()
+        local success, imageData = pcall(function()
+            return game:HttpGet(imageUrl);
+        end);
+        
+        if success and imageData and cache.icon then
+            cache.icon.Data = imageData;
+            cache.icon.Visible = true;
+        else
+            if cache.icon then
+                cache.icon.Visible = false;
+            end
+        end
+    end);
+  end
+
+  local function loadThumbnailAsync(cache, assetId)
+    task.spawn(function()
+        local success, thumbnailUrl = pcall(function()
+            return getAssetThumbnail(assetId);
+        end);
+        
+        if success and thumbnailUrl then
+            loadImageAsync(cache, thumbnailUrl);
+        else
+            if cache.icon then
+                cache.icon.Visible = false;
+            end
+        end
+    end);
+  end
+
   function espLibrary.addObject(object, options)
     local cache = {
         options = options,
         text = nil,
-        box = nil
+        box = nil,
+        icon = nil
     };
     
-    -- Create text object if needed
     if options.espType == "text" or options.espType == "both" then
         cache.text = create("Text", {
             Center = true,
@@ -571,7 +697,6 @@ local espLibrary = {
         });
     end
     
-    -- Create box object if needed
     if options.espType == "box" or options.espType == "both" then
         cache.box = create("Square", {
             Size = options.boxSize,
@@ -580,6 +705,24 @@ local espLibrary = {
             Color = options.color,
             Transparency = options.transparency,
         });
+    end
+    
+    if options.showImage and options.image and options.image ~= "" then
+        cache.icon = create("Image", {
+            Size = options.imageSize,
+            Position = vector2New(0, 0),
+            Transparency = options.transparency,
+            Visible = false,
+        });
+        
+        local imageUrl = options.image;
+        local isAssetId = tonumber(options.image);
+        
+        if isAssetId then
+            loadThumbnailAsync(cache, isAssetId);
+        else
+            loadImageAsync(cache, imageUrl);
+        end
     end
     
     espLibrary.objectCache[object] = cache;
@@ -591,16 +734,19 @@ local espLibrary = {
     if (cache) then
         espLibrary.objectCache[object] = nil;
         
-        -- Properly clean up the text object to prevent ghost visuals
         if cache.text then
             cache.text.Visible = false;
             cache.text:Remove();
         end
         
-        -- Properly clean up the box object to prevent ghost visuals
         if cache.box then
             cache.box.Visible = false;
             cache.box:Remove();
+        end
+        
+        if cache.icon then
+            cache.icon.Visible = false;
+            cache.icon:Remove();
         end
     end
   end
@@ -610,13 +756,11 @@ local espLibrary = {
   
     local options = defaultOptions or {};
     
-    -- Handle Model objects by finding PrimaryPart or suitable child
     local targetObject = object;
     if object:IsA("Model") then
         if object.PrimaryPart then
             targetObject = object.PrimaryPart;
         else
-            -- Find the first BasePart child
             for _, child in next, object:GetChildren() do
                 if child:IsA("BasePart") then
                     targetObject = child;
@@ -635,27 +779,27 @@ local espLibrary = {
     options.text = options.text or object.Name;
     options.font = options.font or 2;
     options.fontSize = options.fontSize or 13;
+    options.showDistance = options.showDistance or false;
+    options.image = options.image or "";
+    options.imageSize = options.imageSize or vector2New(20, 20);
+    options.showImage = options.showImage or false;
     
-    -- ESP type options
     options.espType = options.espType or "text"; -- "text", "box", or "both"
     options.boxSize = BoxSize or options.boxSize or vector2New(50, 50);
     options.boxFilled = options.boxFilled or false;
     options.boxThickness = options.boxThickness or 2;
     
-    -- Store the original object for reference but use targetObject for positioning
     options.originalObject = object;
     options.targetObject = targetObject;
   
     self.addObject(object, options);
   
-    -- Monitor both the original object and targetObject for removal
     insert(self.conns, object.Parent.ChildRemoved:Connect(function(child)
         if (child == object) then
             self.removeObject(child);
         end
     end));
     
-    -- Also monitor the targetObject if it's different from the original object
     if targetObject ~= object and targetObject.Parent then
         insert(self.conns, targetObject.Parent.ChildRemoved:Connect(function(child)
             if (child == targetObject) then
@@ -705,10 +849,9 @@ local espLibrary = {
         self.addChams(player);
     end
   
-    -- Add periodic cleanup task for more thorough cleanup
     insert(self.conns, task.spawn(function()
         while true do
-            task.wait(2) -- Check every 2 seconds
+            task.wait(2)
             for object, cache in next, self.objectCache do
                 if not object or not object.Parent then
                     self.removeObject(object);
@@ -726,10 +869,8 @@ local espLibrary = {
             local character, torso = self.getCharacter(player);
   
             if (character and torso) then
-                -- Add check for dead players
                 local humanoid = character:FindFirstChild("Humanoid")
                 if not humanoid or humanoid.Health <= 0 then
-                    -- Skip rendering ESP for dead players
                     for _, object in next, objects do
                         object.Visible = false
                     end
@@ -737,11 +878,12 @@ local espLibrary = {
                 end
 
                 local onScreen, size, position, torsoPosition = self.getBoxData(torso.Position, Vector3.new(5, 6.5));
-                local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
+                local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude / 4.33;
                 local canShow, enabled = onScreen and (size and position), self.options.enabled;
                 local team, teamColor = self.getTeam(player);
                 local color = self.options.teamColor and teamColor or nil;
                 local tool = self.getTool(player)
+                local kd, kdValue = self.getKD(player)
 
                 if self.options.useCustomTeamColor and self.options.teamColor then
                     color = self.options.customteamColor
@@ -814,6 +956,15 @@ local espLibrary = {
                 objects.top.Color = color or self.options.nameColor;
                 objects.top.Text = player.Name;
                 objects.top.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + 2)));
+
+                local isCheater = kdValue > 3.0
+                objects.cheaterText.Visible = show and self.options.cheaterText and isCheater;
+                objects.cheaterText.Font = self.options.font;
+                objects.cheaterText.Size = self.options.fontSize;
+                objects.cheaterText.Transparency = self.options.nameTransparency;
+                objects.cheaterText.Color = self.options.cheatColor;
+                objects.cheaterText.Text = "POSSIBLE CHEATER";
+                objects.cheaterText.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + objects.cheaterText.TextBounds.Y + 4)));
   
                 objects.side.Visible = show and self.options.healthText;
                 objects.side.Font = self.options.font;
@@ -840,6 +991,16 @@ local espLibrary = {
                 objects.bottom.Color = color or self.options.distanceColor;
                 objects.bottom.Text = tostring(round(distance)) .. self.options.distanceSuffix;
                 objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + Distance_Offset));
+
+                local KD_Offset = objects.bottom.Visible and 13 or 2
+
+                objects.kdText.Visible = show and self.options.kdText;
+                objects.kdText.Font = self.options.font;
+                objects.kdText.Size = self.options.fontSize;
+                objects.kdText.Transparency = self.options.kdTextTransparency;
+                objects.kdText.Color = color or self.options.kdTextColor;
+                objects.kdText.Text = kd;
+                objects.kdText.Position = round(position + vector2New(size.X * 0.5, size.Y + Distance_Offset + KD_Offset));
   
                 objects.box.Visible = show and self.options.boxes;
                 objects.box.Color = color or self.options.boxesColor;
@@ -886,8 +1047,8 @@ local espLibrary = {
                     origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
                     objects.lineoutline.To = torsoPosition;
 
-                -- Update skeleton ESP
                 self.updateSkeleton(character, objects, show);
+                self.updateViewline(character, objects, show);
 
             else
                 local objects = objects
@@ -946,10 +1107,8 @@ local espLibrary = {
                 continue;
             end
             
-            -- Check if the original object or target object still exists
             local targetObject = cache.options.targetObject or object;
             if not object.Parent or (targetObject ~= object and not targetObject.Parent) then
-                -- Object no longer exists, remove ESP
                 self.removeObject(object);
                 continue;
             end
@@ -969,7 +1128,7 @@ local espLibrary = {
             local screenPosition, onScreen = worldToViewportPoint(partPosition);
             local canShow = cache.options.enabled and onScreen;
   
-            if (self.options.limitDistance and distance > self.options.maxDistance) then
+            if (cache.options.limitDistance and distance > cache.options.maxDistance) then
                 canShow = false;
             end
   
@@ -977,18 +1136,22 @@ local espLibrary = {
                 canShow = false;
             end
   
-            -- Update text object if it exists
             if cache.text then
                 cache.text.Visible = canShow;
                 cache.text.Font = cache.options.font;
                 cache.text.Size = cache.options.fontSize;
                 cache.text.Transparency = cache.options.transparency;
                 cache.text.Color = cache.options.color;
-                cache.text.Text = cache.options.text;
+                
+                local displayText = cache.options.text;
+                if cache.options.showDistance then
+                    local distanceMeters = math.floor(distance);
+                    displayText = displayText .. " [" .. distanceMeters .. "m]";
+                end
+                cache.text.Text = displayText;
                 cache.text.Position = round(screenPosition);
             end
             
-            -- Update box object if it exists
             if cache.box then
                 cache.box.Visible = canShow;
                 cache.box.Color = cache.options.color;
@@ -998,14 +1161,20 @@ local espLibrary = {
                 cache.box.Thickness = cache.options.boxThickness;
                 cache.box.Position = round(screenPosition - cache.options.boxSize / 2);
             end
+            
+            if cache.icon then
+                cache.icon.Visible = canShow;
+                cache.icon.Transparency = cache.options.transparency;
+                cache.icon.Size = cache.options.imageSize;
+                local iconOffset = vector2New(0, cache.options.fontSize + 5);
+                cache.icon.Position = round(screenPosition - cache.options.imageSize / 2 + iconOffset);
+            end
         end
     end);
   end
 
-  -- Add new function to handle skeleton ESP
   function espLibrary.updateSkeleton(character, objects, show)
     if not show or not espLibrary.options.skeleton then
-        -- Hide all skeleton lines if skeleton ESP is disabled
         objects.skeletonHead.Visible = false
         objects.skeletonTorso.Visible = false
         objects.skeletonLeftArm.Visible = false
@@ -1024,11 +1193,9 @@ local espLibrary = {
     local humanoid = character:FindFirstChild("Humanoid")
     if not head or not humanoid then return end
 
-    -- Common properties for all skeleton lines
     local color = espLibrary.options.skeletonColor
     local transparency = espLibrary.options.skeletonTransparency
 
-    -- Handle R6 and R15 differently
     if humanoid.RigType == Enum.HumanoidRigType.R6 then
         local torso = character:FindFirstChild("Torso")
         local leftArm = character:FindFirstChild("Left Arm")
@@ -1037,7 +1204,6 @@ local espLibrary = {
         local rightLeg = character:FindFirstChild("Right Leg")
 
         if torso then
-            -- Head to Torso
             local headPos = worldToViewportPoint(head.Position)
             local torsoPos = worldToViewportPoint(torso.Position)
             objects.skeletonHead.From = vector2New(headPos.X, headPos.Y)
@@ -1046,7 +1212,6 @@ local espLibrary = {
             objects.skeletonHead.Transparency = transparency
             objects.skeletonHead.Visible = show
 
-            -- Arms
             if leftArm then
                 local leftArmPos = worldToViewportPoint(leftArm.Position)
                 objects.skeletonLeftArm.From = vector2New(torsoPos.X, torsoPos.Y)
@@ -1065,7 +1230,6 @@ local espLibrary = {
                 objects.skeletonRightArm.Visible = show
             end
 
-            -- Legs
             if leftLeg then
                 local leftLegPos = worldToViewportPoint(leftLeg.Position)
                 objects.skeletonLeftLeg.From = vector2New(torsoPos.X, torsoPos.Y)
@@ -1085,7 +1249,6 @@ local espLibrary = {
             end
         end
     else
-        -- R15 Skeleton
         local upperTorso = character:FindFirstChild("UpperTorso")
         local lowerTorso = character:FindFirstChild("LowerTorso")
         local leftUpperArm = character:FindFirstChild("LeftUpperArm")
@@ -1098,7 +1261,6 @@ local espLibrary = {
         local rightLowerLeg = character:FindFirstChild("RightLowerLeg")
 
         if upperTorso and lowerTorso then
-            -- Head to UpperTorso
             local headPos = worldToViewportPoint(head.Position)
             local upperTorsoPos = worldToViewportPoint(upperTorso.Position)
             local lowerTorsoPos = worldToViewportPoint(lowerTorso.Position)
@@ -1109,14 +1271,12 @@ local espLibrary = {
             objects.skeletonHead.Transparency = transparency
             objects.skeletonHead.Visible = show
 
-            -- Upper to Lower Torso
             objects.skeletonUpperTorso.From = vector2New(upperTorsoPos.X, upperTorsoPos.Y)
             objects.skeletonUpperTorso.To = vector2New(lowerTorsoPos.X, lowerTorsoPos.Y)
             objects.skeletonUpperTorso.Color = color
             objects.skeletonUpperTorso.Transparency = transparency
             objects.skeletonUpperTorso.Visible = show
 
-            -- Arms
             if leftUpperArm and leftLowerArm then
                 local leftUpperArmPos = worldToViewportPoint(leftUpperArm.Position)
                 local leftLowerArmPos = worldToViewportPoint(leftLowerArm.Position)
@@ -1151,7 +1311,6 @@ local espLibrary = {
                 objects.skeletonRightArm.Visible = show
             end
 
-            -- Legs
             if leftUpperLeg and leftLowerLeg then
                 local leftUpperLegPos = worldToViewportPoint(leftUpperLeg.Position)
                 local leftLowerLegPos = worldToViewportPoint(leftLowerLeg.Position)
@@ -1188,5 +1347,189 @@ local espLibrary = {
         end
     end
   end
+
+  function espLibrary.updateViewline(character, objects, show)
+    if not show or not espLibrary.options.viewline then
+        objects.viewline.Visible = false
+        return
+    end
+
+    local head = character:FindFirstChild("Head")
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not head or not humanoid then return end
+
+    local headPosition = head.Position
+    local headCFrame = head.CFrame
+    local lookDirection = headCFrame.LookVector
+    
+    local endPosition = headPosition + (lookDirection * espLibrary.options.viewlineLength)
+    
+    local headScreenPos, headOnScreen = worldToViewportPoint(headPosition)
+    local endScreenPos, endOnScreen = worldToViewportPoint(endPosition)
+    
+    if headOnScreen and endOnScreen then
+        objects.viewline.Visible = show
+        objects.viewline.Color = espLibrary.options.viewlineColor
+        objects.viewline.Transparency = espLibrary.options.viewlineTransparency
+        objects.viewline.From = vector2New(headScreenPos.X, headScreenPos.Y)
+        objects.viewline.To = vector2New(endScreenPos.X, endScreenPos.Y)
+    else
+        objects.viewline.Visible = false
+    end
+  end
+
+  -- Animal ESP System
+  local AnimalESP = {
+    enabled = false,
+    animals = {},
+    connections = {},
+    
+    -- Animal colors
+    colors = {
+      ["Deer"] = Color3.fromRGB(139, 69, 19),      -- Brown
+      ["Rabbit"] = Color3.fromRGB(255, 192, 203),   -- Pink
+      ["Wolf"] = Color3.fromRGB(105, 105, 105),     -- Gray
+      ["Bear"] = Color3.fromRGB(101, 67, 33),      -- Dark brown
+      ["Elk"] = Color3.fromRGB(160, 82, 45),      -- Saddle brown
+      ["Buffalo"] = Color3.fromRGB(139, 69, 19),   -- Brown
+      ["Cougar"] = Color3.fromRGB(255, 140, 0),   -- Orange
+      ["Fox"] = Color3.fromRGB(255, 69, 0),        -- Red orange
+      ["Coyote"] = Color3.fromRGB(210, 180, 140),  -- Tan
+      ["Moose"] = Color3.fromRGB(101, 67, 33),     -- Dark brown
+      ["Default"] = Color3.fromRGB(255, 255, 255)  -- White
+    }
+  }
+
+  function AnimalESP:FindAnimals()
+    local animals = {}
+    
+    local function searchFolder(folder)
+      if not folder then return end
+      
+      for _, child in pairs(folder:GetChildren()) do
+        if child:IsA("Model") then
+          local humanoid = child:FindFirstChildOfClass("Humanoid")
+          if humanoid and not child:FindFirstChild("Player") then -- Not a player
+            local animalName = child.Name
+            if self.colors[animalName] then
+              table.insert(animals, child)
+            end
+          end
+        elseif child:IsA("Folder") then
+          searchFolder(child)
+        end
+      end
+    end
+    
+    -- Search workspace
+    searchFolder(workspace)
+    
+    -- Search WORKSPACE_Entities if it exists
+    local entities = workspace:FindFirstChild("WORKSPACE_Entities")
+    if entities then
+      searchFolder(entities)
+    end
+    
+    return animals
+  end
+
+  function AnimalESP:AddAnimal(animal)
+    if self.animals[animal] then return end
+    
+    local animalName = animal.Name
+    local animalColor = self.colors[animalName] or self.colors["Default"]
+    
+    local options = {
+      enabled = true,
+      color = animalColor,
+      transparency = 1,
+      text = animalName,
+      fontSize = 14,
+      font = 2,
+      espType = "text",
+      showDistance = true,
+      limitDistance = true,
+      maxDistance = 500
+    }
+    
+    -- Use the library's AddObjectEsp function
+    espLibrary:AddObjectEsp(animal, options)
+    
+    self.animals[animal] = true
+  end
+
+  function AnimalESP:RemoveAnimal(animal)
+    if not self.animals[animal] then return end
+    
+    espLibrary.removeObject(animal)
+    self.animals[animal] = nil
+  end
+
+  function AnimalESP:UpdateAnimals()
+    if not self.enabled then return end
+    
+    local currentAnimals = self:FindAnimals()
+    
+    -- Remove animals that no longer exist
+    for animal, _ in pairs(self.animals) do
+      if not animal.Parent then
+        self:RemoveAnimal(animal)
+      end
+    end
+    
+    -- Add new animals
+    for _, animal in pairs(currentAnimals) do
+      if not self.animals[animal] then
+        self:AddAnimal(animal)
+      end
+    end
+  end
+
+  function AnimalESP:Start()
+    if self.enabled then return end
+    
+    self.enabled = true
+    
+    -- Update loop
+    self.connections.UpdateLoop = RunService.Heartbeat:Connect(function()
+      self:UpdateAnimals()
+    end)
+    
+    -- Listen for new animals
+    self.connections.ChildAdded = workspace.ChildAdded:Connect(function(child)
+      if child:IsA("Model") then
+        wait(0.1) -- Wait for model to fully load
+        local humanoid = child:FindFirstChildOfClass("Humanoid")
+        if humanoid and not child:FindFirstChild("Player") then
+          local animalName = child.Name
+          if self.colors[animalName] then
+            self:AddAnimal(child)
+          end
+        end
+      end
+    end)
+  end
+
+  function AnimalESP:Stop()
+    if not self.enabled then return end
+    
+    self.enabled = false
+    
+    -- Disconnect connections
+    for _, connection in pairs(self.connections) do
+      if connection and connection.Connected then
+        connection:Disconnect()
+      end
+    end
+    self.connections = {}
+    
+    -- Remove all animals
+    for animal, _ in pairs(self.animals) do
+      self:RemoveAnimal(animal)
+    end
+  end
+
+  -- Add AnimalESP to the library
+  espLibrary.AnimalESP = AnimalESP
 
   return espLibrary;
